@@ -5,14 +5,17 @@ import { ArrowLeft, ChevronRight, Settings } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
+const BRAND_COLORS = {
+  bajaj: '#00a19b', yamaha: '#0039a6', honda: '#e60012',
+  suzuki: '#005ca9', vento: '#ff6f00', italika: '#d4145a', kawasaki: '#6dc066',
+};
+
 const getBrandColor = (brandName) => {
   const name = brandName?.toLowerCase() || '';
-  if (name.includes('yamaha')) return '#0020bb'; // Yamaha Blue
-  if (name.includes('honda')) return '#e60012'; // Honda Red
-  if (name.includes('suzuki')) return '#005ca9'; // Suzuki Blue
-  if (name.includes('vento')) return '#ff6f00'; // Vento Orange
-  if (name.includes('bajaj') || name.includes('pulsar')) return '#00a19b'; // Bajaj Teal
-  return '#e60012'; // Default red accent (Kanto style)
+  for (const [key, color] of Object.entries(BRAND_COLORS)) {
+    if (name.includes(key)) return color;
+  }
+  return '#e60012';
 };
 
 const MotorcycleDetails = () => {
@@ -33,19 +36,24 @@ const MotorcycleDetails = () => {
         setError('No se pudieron cargar los detalles. Mostrando datos de prueba.');
         setLoading(false);
         
-        // Mock data fallback
-        const isNS200 = id === '1';
+        const mockModels = {
+          '1': { model_name: 'Pulsar NS 200', engine_size: 200, image_url: 'https://i.pinimg.com/736x/5b/18/1a/5b181a25efdaf80f54ce4f7fe7afe360.jpg', brands: { name: 'Bajaj' } },
+          '2': { model_name: 'FZ 25', engine_size: 249, image_url: 'https://i.pinimg.com/736x/ea/07/0c/ea070c16dc1e27b496d3b7e0e4cb3486.jpg', brands: { name: 'Yamaha' } },
+          '3': { model_name: 'CB 250 Twister', engine_size: 250, image_url: 'https://i.pinimg.com/736x/c3/4a/a2/c34aa2a16e6b94d8920de3e9f1a89a91.jpg', brands: { name: 'Honda' } },
+          '4': { model_name: 'Gixxer SF 250', engine_size: 250, image_url: 'https://i.pinimg.com/736x/44/3a/e7/443ae77e44fde9eff2b7e2ff5e959d57.jpg', brands: { name: 'Suzuki' } },
+          '5': { model_name: 'Tornado 250', engine_size: 250, image_url: 'https://i.pinimg.com/736x/3a/4d/c8/3a4dc8b4e43dbd4f1f119eaa4b1dfe21.jpg', brands: { name: 'Vento' } },
+          '6': { model_name: 'Dominar 400', engine_size: 373, image_url: 'https://i.pinimg.com/736x/f6/ac/10/f6ac10c2bd5e116bdfb4e4eac1f23009.jpg', brands: { name: 'Bajaj' } },
+          '7': { model_name: 'MT-03', engine_size: 321, image_url: 'https://i.pinimg.com/736x/4c/87/de/4c87de03dfa66d3b2e2e8dc3e8d39ec0.jpg', brands: { name: 'Yamaha' } },
+          '8': { model_name: 'XR 150L', engine_size: 150, image_url: 'https://i.pinimg.com/736x/dc/56/d4/dc56d4c8e82e3b15be69d2e6eb0ab7e1.jpg', brands: { name: 'Honda' } },
+        };
+        const moto = mockModels[id] || mockModels['1'];
         setData({
-          motorcycle: {
-            model_name: isNS200 ? 'Pulsar NS 200' : id === '2' ? 'FZ-S 3.0' : id === '3' ? 'CBR 250R' : id === '4' ? 'Gixxer SF' : 'Rocketman 250',
-            engine_size: isNS200 ? 200 : id === '3' ? 250 : 150,
-            image_url: isNS200 ? 'https://i.pinimg.com/736x/5b/18/1a/5b181a25efdaf80f54ce4f7fe7afe360.jpg' : `/images/moto${parseInt(id) - 1}.png`,
-            brands: { name: isNS200 ? 'Bajaj' : id === '2' ? 'Yamaha' : id === '3' ? 'Honda' : id === '4' ? 'Suzuki' : 'Vento' }
-          },
+          motorcycle: moto,
           services: [
-            { price: isNS200 ? 550 : 450, services: { name: 'Afinación Básica', description: 'Cambio de aceite, bujía y revisión de frenos.' } },
-            { price: isNS200 ? 980 : 850, services: { name: 'Afinación Completa', description: 'Aceite sintético, bujía iridio, filtro de aire y carburación.' } },
-            { price: 250, services: { name: 'Chequeo General', description: 'Revisión de 15 puntos de seguridad.' } }
+            { price: 550, services: { name: 'Afinación Básica', description: 'Cambio de aceite, bujía y revisión de frenos.' } },
+            { price: 980, services: { name: 'Afinación Completa', description: 'Aceite sintético, bujía iridio, filtro de aire y carburación completa.' } },
+            { price: 250, services: { name: 'Chequeo General', description: 'Revisión de 15 puntos de seguridad del vehículo.' } },
+            { price: 350, services: { name: 'Servicio de Frenos', description: 'Cambio de balatas, purgado de líquido y ajuste de frenos.' } },
           ]
         });
       }
@@ -68,31 +76,29 @@ const MotorcycleDetails = () => {
   return (
     <div className="container animate-fade-in" style={{ '--brand-color': brandColor }}>
       <button className="btn-back" onClick={() => navigate(-1)}>
-        <ArrowLeft size={18} /> Volver al catálogo
+        <ArrowLeft size={16} /> Volver al catálogo
       </button>
 
       <div className="details-layout">
-        {/* Lado izquierdo: Imagen e Info de la moto */}
         <div className="moto-showcase">
           <img 
-            src={data.motorcycle.image_url || 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80'} 
+            src={data.motorcycle.image_url} 
             alt={data.motorcycle.model_name} 
           />
           <h2>{data.motorcycle.model_name}</h2>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', color: 'var(--text-secondary)' }}>
-            <span style={{ fontWeight: 600, color: 'var(--brand-color)' }}>{brandName}</span>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', color: '#666', marginTop: '8px' }}>
+            <span style={{ fontWeight: 700, color: brandColor, fontFamily: 'Oswald, sans-serif', textTransform: 'uppercase' }}>{brandName}</span>
             <span>•</span>
-            <span style={{ fontWeight: 600 }}>{data.motorcycle.engine_size} cc</span>
+            <span style={{ fontWeight: 700, fontFamily: 'Oswald, sans-serif' }}>{data.motorcycle.engine_size} cc</span>
           </div>
         </div>
 
-        {/* Lado derecho: Servicios */}
         <div className="services-container">
-          <h2 style={{ fontSize: '26px', fontFamily: 'Oswald, sans-serif', textTransform: 'uppercase', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <Settings color="var(--brand-color)" /> Servicios Disponibles
+          <h2 style={{ fontSize: '24px', fontFamily: 'Oswald, sans-serif', textTransform: 'uppercase', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <Settings color={brandColor} /> Servicios Disponibles
           </h2>
           
-          {error && <div style={{ color: '#f59e0b', marginBottom: '20px', fontSize: '14px', fontWeight: '500' }}>{error}</div>}
+          {error && <div style={{ color: '#f59e0b', marginBottom: '16px', fontSize: '14px', fontWeight: '500' }}>{error}</div>}
 
           <div className="services-list">
             {data.services && data.services.length > 0 ? (
@@ -104,12 +110,12 @@ const MotorcycleDetails = () => {
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                     <div className="service-price">${item.price}</div>
-                    <ChevronRight color="var(--text-muted)" />
+                    <ChevronRight color="#999" />
                   </div>
                 </div>
               ))
             ) : (
-              <p style={{ color: 'var(--text-secondary)' }}>No hay servicios registrados para esta motocicleta.</p>
+              <p style={{ color: '#666' }}>No hay servicios registrados para esta motocicleta.</p>
             )}
           </div>
         </div>

@@ -9,8 +9,8 @@ function App() {
     <Router>
       <header className="app-header">
         <Link to="/" className="brand">
-          <Wrench size={32} color="#0ea5e9" />
-          <h1>MotoServ</h1>
+          <Wrench size={28} color="#ffffff" />
+          <h1>MOTOSERV</h1>
         </Link>
       </header>
       <main>

@@ -1,206 +1,419 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Oswald:wght@500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700;900&display=swap');
 
+/* ── Variables CSS (Design Tokens) ───────────────────────── */
 :root {
-  --primary-color: #E60012; /* Nintendo Red (Kanto Style) */
-  --primary-hover: #c2000f;
-  --background-light: #f5f5f5;
-  --surface-color: #ffffff;
-  --text-primary: #1a1a1a;
-  --text-secondary: #666666;
-  --text-muted: #999999;
-  --border-color: #e0e0e0;
-  --radius-lg: 12px;
+  --color-bg:         #ffffff;
+  --color-bg-2:       #f5f5f5;
+  --color-surface:    #ffffff;
+  --color-surface-2:  #f0f0f0;
+  --color-border:     #d1d1d1;
+
+  --color-primary:    #E60012;
+  --color-primary-h:  #c2000f;
+
+  --color-text:       #333333;
+  --color-text-muted: #666666;
+  --color-text-dim:   #999999;
+
+  /* Colores de marca */
+  --brand-bajaj:    #00a19b;
+  --brand-yamaha:   #0039a6;
+  --brand-honda:    #e60012;
+  --brand-suzuki:   #005ca9;
+  --brand-vento:    #ff6f00;
+  --brand-italika:  #d4145a;
+  --brand-kawasaki: #6dc066;
+
+  --font-title:  "Oswald", Arial, Helvetica, sans-serif;
+  --font-body:   Arial, Helvetica, sans-serif;
+
+  --space-xs:  4px;
+  --space-sm:  8px;
+  --space-md:  16px;
+  --space-lg:  24px;
+  --space-xl:  40px;
+  --space-2xl: 64px;
+
+  --radius-sm: 4px;
   --radius-md: 8px;
+  --radius-lg: 12px;
   --radius-full: 9999px;
-  --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+  --shadow-sm:   0 2px 4px rgba(0,0,0,0.08);
+  --shadow-md:   0 4px 12px rgba(0,0,0,0.12);
+
+  --transition: 0.2s ease;
+  --transition-bounce: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-* {
+/* ── Reset ───────────────────────────────────────────────── */
+*, *::before, *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+html { scroll-behavior: smooth; font-size: 16px; }
+
 body {
-  font-family: 'Outfit', sans-serif;
-  background-color: var(--background-light);
-  color: var(--text-primary);
-  min-height: 100vh;
+  font-family: var(--font-body);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Header */
+/* ── Header (Barra Roja KantoWeb) ────────────────────────── */
 .app-header {
-  padding: 16px 5%;
+  background: var(--color-primary);
+  padding: 0 5%;
+  height: 56px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 4px solid var(--primary-color);
-  background: var(--surface-color);
-  box-shadow: var(--shadow-sm);
   position: sticky;
   top: 0;
   z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
 .brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   cursor: pointer;
   text-decoration: none;
-  color: var(--text-primary);
 }
 
 .brand h1 {
-  font-family: 'Oswald', sans-serif;
-  font-size: 28px;
-  font-weight: 700;
+  font-family: var(--font-title);
+  font-size: 22px;
+  font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: 1.5px;
-  color: var(--text-primary);
+  letter-spacing: 2px;
+  color: #ffffff;
 }
 
-.brand h1 span {
-  color: var(--primary-color);
-}
-
-/* Containers */
+/* ── Container ───────────────────────────────────────────── */
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 40px 20px;
+  padding: 0 var(--space-md);
+  width: 100%;
 }
 
-.section-title {
-  font-family: 'Oswald', sans-serif;
-  font-size: 36px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 40px;
+/* ── Page Header (Título central) ────────────────────────── */
+.page-header {
   text-align: center;
-  color: var(--text-primary);
+  padding: var(--space-xl) 0 var(--space-lg);
 }
 
-.motorcycle-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 30px;
+.page-title {
+  font-family: var(--font-title);
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 900;
+  color: var(--color-text);
 }
 
-/* Card Styles (Estilo Pokémon Kanto) */
-.moto-card {
+.page-title span {
+  color: var(--color-primary);
+}
+
+.page-subtitle {
+  color: var(--color-text-muted);
+  margin-top: var(--space-sm);
+  font-size: 0.95rem;
+}
+
+/* ── Search ──────────────────────────────────────────────── */
+.search-wrapper {
   position: relative;
-  background: var(--surface-color);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  box-shadow: var(--shadow-sm);
-  transition: var(--transition);
-  cursor: pointer;
   display: flex;
-  flex-direction: column;
-}
-
-.card-brand-bar {
-  height: 8px;
-  background-color: var(--brand-color, var(--primary-color));
+  align-items: center;
+  max-width: 500px;
+  margin: 0 auto var(--space-md);
   width: 100%;
 }
 
-.moto-card:hover {
-  transform: translateY(-8px);
-  box-shadow: var(--shadow-md), 0 0 0 1px var(--brand-color);
-  border-color: var(--brand-color);
+.search-icon {
+  position: absolute;
+  left: 16px;
+  font-size: 0.9rem;
+  pointer-events: none;
+  z-index: 1;
+  color: var(--color-text-muted);
+  font-weight: 700;
 }
 
-.card-image-container {
+.search-input {
   width: 100%;
-  height: 220px;
-  background: #fbfbfb;
-  position: relative;
-  overflow: hidden;
+  padding: 12px 16px 12px 80px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  transition: all var(--transition);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(230, 0, 18, 0.15);
+}
+
+.search-input::placeholder {
+  color: var(--color-text-dim);
+}
+
+.search-clear {
+  position: absolute;
+  right: 14px;
+  background: var(--color-text-muted);
+  color: var(--color-bg);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 0.65rem;
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-bottom: 1px solid var(--border-color);
+  cursor: pointer;
+  border: none;
+  transition: background var(--transition);
 }
 
-.moto-image {
-  width: 90%;
-  height: 90%;
-  object-fit: contain;
-  transition: var(--transition);
+.search-clear:hover { background: var(--color-text); }
+
+/* ── Brand Filter Pills ──────────────────────────────────── */
+.brand-scroll {
+  display: flex;
+  gap: var(--space-sm);
+  overflow-x: auto;
+  padding-bottom: var(--space-sm);
+  justify-content: center;
+  flex-wrap: wrap;
+  scrollbar-width: none;
+  margin-bottom: var(--space-xl);
 }
 
-.moto-card:hover .moto-image {
-  transform: scale(1.08) translateY(-4px);
-}
+.brand-scroll::-webkit-scrollbar { display: none; }
 
-.brand-badge {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  background: var(--brand-color, var(--primary-color));
-  color: white;
-  padding: 4px 14px;
+.brand-btn {
+  padding: 6px 18px;
   border-radius: var(--radius-full);
-  font-family: 'Oswald', sans-serif;
-  font-size: 13px;
+  font-family: var(--font-title);
+  font-size: 0.78rem;
+  font-weight: 700;
   text-transform: uppercase;
-  font-weight: 500;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  letter-spacing: 0.5px;
+  border: 2px solid transparent;
+  color: var(--color-text-muted);
+  background: var(--color-surface);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--transition);
+  flex-shrink: 0;
 }
 
-.card-content {
-  padding: 20px;
+.brand-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-text);
+}
+
+.brand-btn.active {
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+  transform: translateY(-1px);
+}
+
+.brand-btn.active:not([data-brand]) {
+  background: var(--color-primary);
+}
+.brand-btn.active[data-brand="bajaj"]    { background: var(--brand-bajaj); }
+.brand-btn.active[data-brand="yamaha"]   { background: var(--brand-yamaha); }
+.brand-btn.active[data-brand="honda"]    { background: var(--brand-honda); }
+.brand-btn.active[data-brand="suzuki"]   { background: var(--brand-suzuki); }
+.brand-btn.active[data-brand="vento"]    { background: var(--brand-vento); }
+.brand-btn.active[data-brand="italika"]  { background: var(--brand-italika); }
+.brand-btn.active[data-brand="kawasaki"] { background: var(--brand-kawasaki); }
+
+/* ── Grid de Motos ───────────────────────────────────────── */
+.motorcycle-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--space-lg);
+  margin-bottom: var(--space-xl);
+}
+
+/* ── Moto Card (Estilo PokemonCard) ──────────────────────── */
+.moto-card {
+  position: relative;
+  background: var(--color-surface);
+  border: 1px solid rgba(0,0,0,0.07);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md) var(--space-md) var(--space-sm);
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform var(--transition-bounce), box-shadow var(--transition), border-color var(--transition);
+  animation: fadeInUp 0.4s ease both;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  flex-grow: 1;
+  align-items: center;
+  gap: var(--space-sm);
 }
 
-.moto-name {
-  font-family: 'Oswald', sans-serif;
-  font-size: 22px;
+.moto-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.15), 0 0 0 1px var(--brand-color, var(--color-primary));
+  border-color: var(--brand-color, var(--color-primary));
+}
+
+/* Fondo decorativo circular (como el PokemonCard) */
+.card-bg-circle {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: var(--brand-color, var(--color-primary));
+  opacity: 0.08;
+  top: -30px;
+  right: -30px;
+  transition: transform var(--transition), opacity var(--transition);
+  pointer-events: none;
+}
+
+.moto-card:hover .card-bg-circle {
+  opacity: 0.15;
+  transform: scale(1.2);
+}
+
+/* Número / CC */
+.card-num {
+  font-family: var(--font-title);
+  font-size: 0.75rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--color-text-dim);
+  align-self: flex-start;
+  letter-spacing: 1px;
+}
+
+/* Sprite / Imagen de la moto */
+.card-sprite-wrap {
+  width: 140px;
+  height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.15));
+  transition: transform var(--transition-bounce), filter var(--transition);
+}
+
+.moto-card:hover .card-sprite-wrap {
+  transform: translateY(-4px) scale(1.05);
+  filter: drop-shadow(0 8px 16px rgba(0,0,0,0.25));
+}
+
+.card-sprite {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Nombre */
+.card-name {
+  font-family: var(--font-title);
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--color-text);
   text-transform: uppercase;
 }
 
-.moto-engine {
-  color: var(--text-secondary);
-  font-size: 15px;
-  font-weight: 600;
+/* Badges de marca */
+.card-types {
+  display: flex;
+  gap: var(--space-xs);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.type-badge {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-title);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+
+/* Stats mini (barras de CC y precio) */
+.card-stats-mini {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: var(--space-xs);
+}
+
+.stat-mini {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-sm);
 }
 
-.moto-engine svg {
-  color: var(--brand-color, var(--primary-color));
+.stat-mini-label {
+  font-family: var(--font-title);
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  width: 24px;
+  flex-shrink: 0;
 }
 
-/* Details Page */
+.stat-mini-bar {
+  flex: 1;
+  height: 4px;
+  background: rgba(0,0,0,0.06);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.stat-mini-fill {
+  height: 100%;
+  background: var(--brand-color, var(--color-primary));
+  border-radius: 2px;
+  transition: width 0.6s ease;
+}
+
+/* ── Details Page ────────────────────────────────────────── */
 .details-layout {
   display: grid;
   grid-template-columns: 1fr 1.8fr;
   gap: 40px;
   align-items: start;
+  padding-top: var(--space-xl);
+  padding-bottom: var(--space-xl);
 }
 
 @media (max-width: 768px) {
-  .details-layout {
-    grid-template-columns: 1fr;
+  .details-layout { grid-template-columns: 1fr; }
+  .motorcycle-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: var(--space-md);
   }
 }
 
 .moto-showcase {
-  background: var(--surface-color);
-  border: 1px solid var(--border-color);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: 30px;
   text-align: center;
@@ -209,15 +422,16 @@ body {
 
 .moto-showcase img {
   width: 100%;
-  max-height: 280px;
+  max-height: 260px;
   object-fit: contain;
   margin-bottom: 24px;
   filter: drop-shadow(0 8px 16px rgba(0,0,0,0.1));
 }
 
 .moto-showcase h2 {
-  font-family: 'Oswald', sans-serif;
-  font-size: 32px;
+  font-family: var(--font-title);
+  font-size: 28px;
+  font-weight: 900;
   text-transform: uppercase;
   margin-bottom: 12px;
 }
@@ -229,16 +443,16 @@ body {
 }
 
 .service-item {
-  background: var(--surface-color);
-  border: 1px solid var(--border-color);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 24px;
+  padding: 22px;
   box-shadow: var(--shadow-sm);
   transition: var(--transition);
-  border-left: 6px solid var(--brand-color, var(--primary-color));
+  border-left: 6px solid var(--brand-color, var(--color-primary));
 }
 
 .service-item:hover {
@@ -247,86 +461,104 @@ body {
 }
 
 .service-info h3 {
-  font-family: 'Oswald', sans-serif;
-  font-size: 20px;
+  font-family: var(--font-title);
+  font-size: 18px;
   font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 6px;
+  color: var(--color-text);
+  margin-bottom: 4px;
   text-transform: uppercase;
 }
 
 .service-info p {
-  font-size: 15px;
-  color: var(--text-secondary);
-  line-height: 1.4;
+  font-size: 14px;
+  color: var(--color-text-muted);
 }
 
 .service-price {
-  font-family: 'Oswald', sans-serif;
-  font-size: 26px;
+  font-family: var(--font-title);
+  font-size: 24px;
   font-weight: 700;
-  color: var(--brand-color, var(--primary-color));
+  color: var(--brand-color, var(--color-primary));
 }
 
-/* Navigation & Utility */
+/* ── Back button ─────────────────────────────────────────── */
 .btn-back {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: var(--surface-color);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-full);
-  padding: 10px 20px;
+  padding: 8px 20px;
   cursor: pointer;
-  font-family: 'Oswald', sans-serif;
-  font-size: 15px;
+  font-family: var(--font-title);
+  font-size: 14px;
   text-transform: uppercase;
-  margin-bottom: 30px;
+  font-weight: 700;
+  margin-top: var(--space-lg);
   box-shadow: var(--shadow-sm);
-  transition: var(--transition);
+  transition: all var(--transition);
 }
 
 .btn-back:hover {
-  background: var(--primary-color);
+  background: var(--color-primary);
   color: white;
-  border-color: var(--primary-color);
-  transform: translateX(-4px);
+  border-color: var(--color-primary);
 }
 
-/* Animations */
+/* ── Animations ──────────────────────────────────────────── */
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .animate-fade-in {
   animation: fadeInUp 0.4s ease both;
 }
 
-/* Loader */
+/* ── Loader ──────────────────────────────────────────────── */
 .loader-container {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
+  gap: var(--space-lg);
+  padding: var(--space-2xl);
   height: 50vh;
 }
 
 .loader {
-  width: 50px;
-  height: 50px;
-  border: 4px solid var(--border-color);
-  border-top-color: var(--primary-color);
+  width: 48px;
+  height: 48px;
+  border: 4px solid var(--color-border);
+  border-top-color: var(--color-primary);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+/* ── Error banner ────────────────────────────────────────── */
+.error-banner {
+  color: #dc2626;
+  text-align: center;
+  background: rgba(220,38,38,0.06);
+  border: 1px solid rgba(220,38,38,0.15);
+  padding: 12px;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  margin-bottom: var(--space-lg);
+  font-size: 0.9rem;
+}
+
+/* ── Empty State ─────────────────────────────────────────── */
+.empty-state {
+  text-align: center;
+  padding: var(--space-2xl);
+  color: var(--color-text-muted);
+  font-family: var(--font-title);
+  font-size: 1.1rem;
 }

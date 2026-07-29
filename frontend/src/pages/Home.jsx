@@ -4,35 +4,62 @@ import MotorcycleCard from '../components/MotorcycleCard';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
+const BRANDS = ['todos', 'bajaj', 'yamaha', 'honda', 'suzuki', 'vento', 'italika', 'kawasaki'];
+
 const Home = () => {
   const [motorcycles, setMotorcycles] = useState([]);
+  const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [search, setSearch] = useState('');
+  const [brandFilter, setBrandFilter] = useState('todos');
 
   useEffect(() => {
     const fetchMotorcycles = async () => {
       try {
         const response = await axios.get(`${API_URL}/motorcycles`);
         setMotorcycles(response.data);
+        setFiltered(response.data);
         setLoading(false);
       } catch (err) {
         console.error('Error fetching motorcycles:', err);
-        setError('No se pudieron cargar los modelos de motocicletas. Asegúrate de tener el backend corriendo y las tablas creadas en Supabase.');
+        setError('No se pudieron cargar las motos del servidor. Mostrando datos de prueba.');
         setLoading(false);
         
-        // Mock data for UI presentation if backend is down
-        setMotorcycles([
+        const mockData = [
           { id: '1', model_name: 'Pulsar NS 200', engine_size: 200, image_url: 'https://i.pinimg.com/736x/5b/18/1a/5b181a25efdaf80f54ce4f7fe7afe360.jpg', brands: { name: 'Bajaj' } },
-          { id: '2', model_name: 'FZ-S 3.0', engine_size: 149, image_url: '/images/moto1.png', brands: { name: 'Yamaha' } },
-          { id: '3', model_name: 'CBR 250R', engine_size: 250, image_url: '/images/moto2.png', brands: { name: 'Honda' } },
-          { id: '4', model_name: 'Gixxer SF', engine_size: 155, image_url: '/images/moto3.png', brands: { name: 'Suzuki' } },
-          { id: '5', model_name: 'Rocketman 250', engine_size: 250, image_url: '/images/moto4.png', brands: { name: 'Vento' } }
-        ]);
+          { id: '2', model_name: 'FZ 25', engine_size: 249, image_url: 'https://i.pinimg.com/736x/ea/07/0c/ea070c16dc1e27b496d3b7e0e4cb3486.jpg', brands: { name: 'Yamaha' } },
+          { id: '3', model_name: 'CB 250 Twister', engine_size: 250, image_url: 'https://i.pinimg.com/736x/c3/4a/a2/c34aa2a16e6b94d8920de3e9f1a89a91.jpg', brands: { name: 'Honda' } },
+          { id: '4', model_name: 'Gixxer SF 250', engine_size: 250, image_url: 'https://i.pinimg.com/736x/44/3a/e7/443ae77e44fde9eff2b7e2ff5e959d57.jpg', brands: { name: 'Suzuki' } },
+          { id: '5', model_name: 'Tornado 250', engine_size: 250, image_url: 'https://i.pinimg.com/736x/3a/4d/c8/3a4dc8b4e43dbd4f1f119eaa4b1dfe21.jpg', brands: { name: 'Vento' } },
+          { id: '6', model_name: 'Dominar 400', engine_size: 373, image_url: 'https://i.pinimg.com/736x/f6/ac/10/f6ac10c2bd5e116bdfb4e4eac1f23009.jpg', brands: { name: 'Bajaj' } },
+          { id: '7', model_name: 'MT-03', engine_size: 321, image_url: 'https://i.pinimg.com/736x/4c/87/de/4c87de03dfa66d3b2e2e8dc3e8d39ec0.jpg', brands: { name: 'Yamaha' } },
+          { id: '8', model_name: 'XR 150L', engine_size: 150, image_url: 'https://i.pinimg.com/736x/dc/56/d4/dc56d4c8e82e3b15be69d2e6eb0ab7e1.jpg', brands: { name: 'Honda' } },
+        ];
+        setMotorcycles(mockData);
+        setFiltered(mockData);
       }
     };
 
     fetchMotorcycles();
   }, []);
+
+  // Filtrar por búsqueda y marca
+  useEffect(() => {
+    let result = motorcycles;
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      result = result.filter(m =>
+        m.model_name.toLowerCase().includes(q) || String(m.engine_size).includes(q)
+      );
+    }
+    if (brandFilter !== 'todos') {
+      result = result.filter(m =>
+        m.brands?.name?.toLowerCase().includes(brandFilter)
+      );
+    }
+    setFiltered(result);
+  }, [search, brandFilter, motorcycles]);
 
   if (loading) {
     return (
@@ -44,14 +71,62 @@ const Home = () => {
 
   return (
     <div className="container">
-      <h2 className="section-title">Selecciona tu Motocicleta</h2>
-      {error && <div style={{ color: '#dc2626', marginBottom: '20px', textAlign: 'center', background: 'rgba(220,38,38,0.08)', border: '1px solid rgba(220,38,38,0.2)', padding: '12px', borderRadius: '8px', fontWeight: '500' }}>{error} <br/> (Mostrando datos de prueba)</div>}
-      
-      <div className="motorcycle-grid">
-        {motorcycles.map((moto) => (
-          <MotorcycleCard key={moto.id} moto={moto} />
+      {/* Header de página estilo Kanto */}
+      <div className="page-header">
+        <h1 className="page-title">
+          Catálogo <span>MotoServ</span>
+        </h1>
+        <p className="page-subtitle">
+          {motorcycles.length} modelos disponibles · {filtered.length} mostrados
+        </p>
+      </div>
+
+      {/* Buscador */}
+      <div className="search-wrapper">
+        <span className="search-icon">Buscar:</span>
+        <input
+          type="text"
+          className="search-input"
+          placeholder="Buscar por modelo o cilindraje..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+        />
+        {search && (
+          <button className="search-clear" onClick={() => setSearch('')}>X</button>
+        )}
+      </div>
+
+      {/* Filtros de marca (como los tipos de Pokémon) */}
+      <div className="brand-scroll">
+        {BRANDS.map(brand => (
+          <button
+            key={brand}
+            className={`brand-btn ${brandFilter === brand ? 'active' : ''}`}
+            data-brand={brand !== 'todos' ? brand : undefined}
+            onClick={() => setBrandFilter(brand)}
+          >
+            {brand === 'todos' ? 'Todos' : brand.charAt(0).toUpperCase() + brand.slice(1)}
+          </button>
         ))}
       </div>
+
+      {error && <div className="error-banner">{error}</div>}
+
+      {/* Grid de tarjetas */}
+      {filtered.length === 0 ? (
+        <div className="empty-state">
+          <p>No se encontraron motocicletas con ese criterio.</p>
+          <button className="btn-back" onClick={() => { setSearch(''); setBrandFilter('todos'); }}>
+            Limpiar filtros
+          </button>
+        </div>
+      ) : (
+        <div className="motorcycle-grid">
+          {filtered.map((moto, i) => (
+            <MotorcycleCard key={moto.id} moto={moto} delay={i * 30} />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
