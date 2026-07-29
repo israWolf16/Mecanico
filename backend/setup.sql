@@ -52,13 +52,13 @@ WITH
     INSERT INTO motorcycles (brand_id, model_name, engine_size, image_url)
     SELECT id, 'Pulsar NS 200', 200, 'https://i.pinimg.com/736x/5b/18/1a/5b181a25efdaf80f54ce4f7fe7afe360.jpg' FROM inserted_brands WHERE name = 'Bajaj'
     UNION ALL
-    SELECT id, 'FZ-S 3.0', 149, '/images/moto1.png' FROM inserted_brands WHERE name = 'Yamaha'
+    SELECT id, 'FZ-S 3.0', 149, 'https://i.pinimg.com/736x/3a/ae/72/3aae72a46bf043cad52e85030e2e96a4.jpg' FROM inserted_brands WHERE name = 'Yamaha'
     UNION ALL
-    SELECT id, 'CBR 250R', 250, '/images/moto2.png' FROM inserted_brands WHERE name = 'Honda'
+    SELECT id, 'CBR 250R', 250, 'https://i.pinimg.com/736x/db/5b/9e/db5b9ea4956d501492f0f0e237461dfb.jpg' FROM inserted_brands WHERE name = 'Honda'
     UNION ALL
-    SELECT id, 'Gixxer SF', 155, '/images/moto3.png' FROM inserted_brands WHERE name = 'Suzuki'
+    SELECT id, 'Gixxer SF', 155, 'https://i.pinimg.com/1200x/08/1f/7a/081f7a10432a24d7d4916096a4398b64.jpg' FROM inserted_brands WHERE name = 'Suzuki'
     UNION ALL
-    SELECT id, 'Rocketman 250', 250, '/images/moto4.png' FROM inserted_brands WHERE name = 'Vento'
+    SELECT id, 'Rocketman 250', 250, 'https://i.pinimg.com/736x/e7/d4/13/e7d4131046a2749101f0696389bc2cbc.jpg' FROM inserted_brands WHERE name = 'Vento'
     RETURNING id, model_name
   ),
   inserted_services AS (
@@ -73,8 +73,17 @@ SELECT
     m.id, 
     s.id, 
     CASE 
-        WHEN s.name = 'Afinación Básica' THEN 450.00
-        WHEN s.name = 'Afinación Completa' THEN 850.00
-        ELSE 200.00
+        WHEN s.name = 'Chequeo General' THEN 100.00
+        WHEN s.name = 'Afinación Básica' AND m.model_name = 'Pulsar NS 200' THEN 450.00
+        WHEN s.name = 'Afinación Completa' AND m.model_name = 'Pulsar NS 200' THEN 850.00
+        WHEN s.name = 'Afinación Básica' AND m.model_name = 'FZ-S 3.0' THEN 400.00
+        WHEN s.name = 'Afinación Completa' AND m.model_name = 'FZ-S 3.0' THEN 750.00
+        WHEN s.name = 'Afinación Básica' AND m.model_name = 'CBR 250R' THEN 600.00
+        WHEN s.name = 'Afinación Completa' AND m.model_name = 'CBR 250R' THEN 1100.00
+        WHEN s.name = 'Afinación Básica' AND m.model_name = 'Gixxer SF' THEN 420.00
+        WHEN s.name = 'Afinación Completa' AND m.model_name = 'Gixxer SF' THEN 800.00
+        WHEN s.name = 'Afinación Básica' AND m.model_name = 'Rocketman 250' THEN 380.00
+        WHEN s.name = 'Afinación Completa' AND m.model_name = 'Rocketman 250' THEN 700.00
+        ELSE 500.00
     END
 FROM inserted_motos m CROSS JOIN inserted_services s;

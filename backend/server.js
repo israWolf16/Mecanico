@@ -9,7 +9,7 @@ const app = express();
 // Middlewares
 app.use(cors({
     origin: ['http://localhost:5173', 'https://israwolf16.github.io'],
-    methods: ['GET']
+    methods: ['GET', 'POST', 'DELETE', 'OPTIONS']
 }));
 app.use(express.json());
 
