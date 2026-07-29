@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { Wrench } from 'lucide-react';
 import Home from './pages/Home';
 import MotorcycleDetails from './pages/MotorcycleDetails';

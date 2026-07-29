@@ -1,4 +1,10 @@
--- Script de configuración para Supabase PostgreSQL
+-- Script de configuración para Supabase PostgreSQL (Versión Segura)
+
+-- Eliminar tablas si ya existen (para evitar errores si se ejecuta más de una vez)
+DROP TABLE IF EXISTS motorcycle_services;
+DROP TABLE IF EXISTS services;
+DROP TABLE IF EXISTS motorcycles;
+DROP TABLE IF EXISTS brands;
 
 -- 1. Crear tabla de marcas
 CREATE TABLE brands (
@@ -36,11 +42,6 @@ CREATE TABLE motorcycle_services (
 -- Datos de Prueba Iniciales (Mock Data) para probar rápidamente
 -- -------------------------------------------------------------
 
--- Insertar Marcas y guardar los UUIDs (Para este ejemplo usaremos UUIDs generados)
--- Nota: En un caso real insertarías uno por uno o usarías funciones, pero aquí 
--- un ejemplo simple de cómo poblarías.
-
--- Para facilitar el copiado y pegado inicial, podemos usar gen_random_uuid():
 WITH 
   inserted_brands AS (
     INSERT INTO brands (name) VALUES 

@@ -6,7 +6,11 @@ require('dotenv').config();
 const app = express();
 
 // Middlewares
-app.use(cors());
+// Middlewares
+app.use(cors({
+    origin: ['http://localhost:5173', 'https://israwolf16.github.io'],
+    methods: ['GET']
+}));
 app.use(express.json());
 
 // Rutas
