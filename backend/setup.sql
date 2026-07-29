@@ -45,11 +45,13 @@ CREATE TABLE motorcycle_services (
 WITH 
   inserted_brands AS (
     INSERT INTO brands (name) VALUES 
-    ('Yamaha'), ('Honda'), ('Suzuki'), ('Vento')
+    ('Bajaj'), ('Yamaha'), ('Honda'), ('Suzuki'), ('Vento')
     RETURNING id, name
   ),
   inserted_motos AS (
     INSERT INTO motorcycles (brand_id, model_name, engine_size, image_url)
+    SELECT id, 'Pulsar NS 200', 200, 'https://i.pinimg.com/736x/5b/18/1a/5b181a25efdaf80f54ce4f7fe7afe360.jpg' FROM inserted_brands WHERE name = 'Bajaj'
+    UNION ALL
     SELECT id, 'FZ-S 3.0', 149, '/images/moto1.png' FROM inserted_brands WHERE name = 'Yamaha'
     UNION ALL
     SELECT id, 'CBR 250R', 250, '/images/moto2.png' FROM inserted_brands WHERE name = 'Honda'
