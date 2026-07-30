@@ -114,7 +114,7 @@ const AdminCalendar = () => {
     setEvidence(appt.evidence_images ? appt.evidence_images.join(', ') : '');
   };
 
-  const updateAppt = async (statusUpdate = null, issueReason = null) => {
+  const updateAppt = async (statusUpdate = null, issueReason = null, isNote = false) => {
     try {
       const token = localStorage.getItem('adminToken');
       const headers = { Authorization: `Bearer ${token}` };
@@ -135,6 +135,8 @@ const AdminCalendar = () => {
         window.open(`https://wa.me/${phone}?text=Hola! Tu moto ${selectedAppt.motorcycle?.model_name || 'moto'} se encuentra lista, puedes pasar a recogerla. - MotoServ`);
       } else if (statusUpdate === 'inconveniente') {
         window.open(`https://wa.me/${phone}?text=Hola! Hemos encontrado un inconveniente con tu moto ${selectedAppt.motorcycle?.model_name || 'moto'}: ${issueReason}. Por favor contáctanos. - MotoServ`);
+      } else if (isNote && notes) {
+        window.open(`https://wa.me/${phone}?text=Te adjunto el avance de tu moto en ${selectedAppt.motorcycle?.model_name || 'moto'}: ${notes}`);
       }
       
       fetchAppointments();
@@ -157,7 +159,7 @@ const AdminCalendar = () => {
   };
 
   const handleSaveNotes = () => {
-    updateAppt();
+    updateAppt(null, null, true);
   };
 
   const handleDeleteAppt = async () => {
@@ -233,17 +235,7 @@ const AdminCalendar = () => {
               />
             </div>
 
-            <div className="form-group" style={{ marginBottom: '16px' }}>
-              <label className="form-label"><Camera size={14} /> Enlaces de Evidencia (separados por coma)</label>
-              <input 
-                type="text" 
-                className="search-input" 
-                style={{ paddingLeft: '16px', width: '100%', boxSizing: 'border-box' }} 
-                value={evidence} 
-                onChange={e => setEvidence(e.target.value)} 
-                placeholder="https://img.url/1.jpg, https://img.url/2.jpg"
-              />
-            </div>
+
             
             <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
               <button onClick={handleSaveNotes} className="btn-back" style={{ flex: 1, backgroundColor: '#f3f4f6' }}>
