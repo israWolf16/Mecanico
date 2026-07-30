@@ -162,10 +162,10 @@ router.get('/services', async (req, res) => {
 // 9. Crear cita (público)
 router.post('/appointments', async (req, res) => {
     try {
-        const { motorcycle_id, service_name, service_price, client_name, client_phone, observations, appointment_date, appointment_time } = req.body;
+        const { motorcycle_id, service_name, service_price, client_name, client_phone, observations, moto_color, fuel_type, appointment_date, appointment_time } = req.body;
         const { data, error } = await supabase
             .from('appointments')
-            .insert([{ motorcycle_id, service_name, service_price, client_name, client_phone, observations, appointment_date, appointment_time }])
+            .insert([{ motorcycle_id, service_name, service_price, client_name, client_phone, observations, moto_color, fuel_type, appointment_date, appointment_time }])
             .select();
         if (error) throw error;
         res.json(data[0]);

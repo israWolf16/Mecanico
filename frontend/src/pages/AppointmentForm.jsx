@@ -1,9 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { CalendarDays, Phone, User, FileText, ArrowLeft, CheckCircle } from 'lucide-react';
+import { CalendarDays, Phone, User, FileText, ArrowLeft, CheckCircle, Palette, Fuel } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+
+const COLORES = [
+  'Roja', 'Negra', 'Blanca', 'Azul', 'Gris', 'Amarilla', 'Verde', 'Naranja', 'Morada', 'Rosa', 'Plateada', 'Dorada'
+];
 
 const AppointmentForm = () => {
   const [searchParams] = useSearchParams();
@@ -16,6 +20,9 @@ const AppointmentForm = () => {
   const servicePrice = searchParams.get('servicePrice') || '';
 
   const [form, setForm] = useState({ client_name: '', client_phone: '', observations: '', appointment_date: '', appointment_time: '' });
+  const [color1, setColor1] = useState('');
+  const [color2, setColor2] = useState('');
+  const [fuelType, setFuelType] = useState('');
   const [blockedDates, setBlockedDates] = useState([]);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState(null);
@@ -47,15 +54,26 @@ const AppointmentForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+    if (!color1) {
+      setError('Por favor selecciona al menos un color de tu moto.');
+      return;
+    }
+    if (!fuelType) {
+      setError('Por favor indica si tu moto es carburada o de inyección.');
+      return;
+    }
     if (isDateBlocked(form.appointment_date)) {
       setError('Ese día no está disponible. Por favor elige otro.');
       return;
     }
+    const motoColor = color2 ? `${color1} con ${color2}` : color1;
     try {
       await axios.post(`${API_URL}/appointments`, {
         motorcycle_id: motoId,
         service_name: serviceName,
         service_price: parseFloat(servicePrice),
+        moto_color: motoColor,
+        fuel_type: fuelType,
         ...form
       });
       setSubmitted(true);
@@ -115,6 +133,63 @@ const AppointmentForm = () => {
           <div className="form-group">
             <label className="form-label"><Phone size={14} /> Teléfono (WhatsApp)</label>
             <input type="tel" className="search-input" style={{ paddingLeft: '16px' }} placeholder="Ej: 5512345678" value={form.client_phone} onChange={e => setForm({...form, client_phone: e.target.value})} required />
+          </div>
+
+          {/* Color de la moto */}
+          <div className="form-group">
+            <label className="form-label"><Palette size={14} /> Color de la moto</label>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div>
+                <label style={{ fontSize: '12px', color: '#999', marginBottom: '4px', display: 'block' }}>Color principal *</label>
+                <select className="search-input" style={{ paddingLeft: '16px' }} value={color1} onChange={e => setColor1(e.target.value)} required>
+                  <option value="">Selecciona</option>
+                  {COLORES.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+              <div>
+                <label style={{ fontSize: '12px', color: '#999', marginBottom: '4px', display: 'block' }}>Segundo color (opcional)</label>
+                <select className="search-input" style={{ paddingLeft: '16px' }} value={color2} onChange={e => setColor2(e.target.value)}>
+                  <option value="">Ninguno</option>
+                  {COLORES.filter(c => c !== color1).map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+            </div>
+            {color1 && (
+              <div style={{ marginTop: '8px', fontSize: '14px', fontWeight: 600, color: '#333' }}>
+                Vista previa: <span style={{ color: 'var(--color-primary)' }}>{color2 ? `${color1} con ${color2}` : color1}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Tipo de combustión */}
+          <div className="form-group">
+            <label className="form-label"><Fuel size={14} /> Tipo de motor</label>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <label
+                style={{
+                  flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                  padding: '12px', border: `2px solid ${fuelType === 'Carburada' ? 'var(--color-primary)' : '#ddd'}`,
+                  borderRadius: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '14px',
+                  backgroundColor: fuelType === 'Carburada' ? 'rgba(230,0,18,0.05)' : '#fff',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <input type="radio" name="fuelType" value="Carburada" checked={fuelType === 'Carburada'} onChange={e => setFuelType(e.target.value)} style={{ display: 'none' }} />
+                ⛽ Carburada
+              </label>
+              <label
+                style={{
+                  flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                  padding: '12px', border: `2px solid ${fuelType === 'Inyección Electrónica' ? 'var(--color-primary)' : '#ddd'}`,
+                  borderRadius: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '14px',
+                  backgroundColor: fuelType === 'Inyección Electrónica' ? 'rgba(230,0,18,0.05)' : '#fff',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <input type="radio" name="fuelType" value="Inyección Electrónica" checked={fuelType === 'Inyección Electrónica'} onChange={e => setFuelType(e.target.value)} style={{ display: 'none' }} />
+                💉 Inyección
+              </label>
+            </div>
           </div>
 
           <div className="form-group">

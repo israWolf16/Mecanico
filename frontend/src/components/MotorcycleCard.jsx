@@ -22,7 +22,7 @@ const getBrandColor = (brandName) => {
 const MotorcycleCard = ({ moto, delay = 0 }) => {
   const navigate = useNavigate();
   const brandName = moto.brands?.name || 'Desconocida';
-  const brandColor = getBrandColor(brandName);
+  const brandColor = moto.accent_color || getBrandColor(brandName);
   const ccPercent = Math.min(100, (moto.engine_size / 400) * 100);
 
   return (

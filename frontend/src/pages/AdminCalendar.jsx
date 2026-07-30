@@ -132,11 +132,11 @@ const AdminCalendar = () => {
       
       let phone = selectedAppt.client_phone.replace(/\D/g, '');
       if (statusUpdate === 'terminada') {
-        window.open(`https://wa.me/${phone}?text=Hola! Tu moto ${selectedAppt.motorcycle?.model_name || 'moto'} se encuentra lista, puedes pasar a recogerla. - MotoServ`);
+        window.open(`https://wa.me/${phone}?text=Hola! Tu moto ${selectedAppt.motorcycles?.model_name || 'moto'} se encuentra lista, puedes pasar a recogerla. - MotoServ`);
       } else if (statusUpdate === 'inconveniente') {
-        window.open(`https://wa.me/${phone}?text=Hola! Hemos encontrado un inconveniente con tu moto ${selectedAppt.motorcycle?.model_name || 'moto'}: ${issueReason}. Por favor contáctanos. - MotoServ`);
+        window.open(`https://wa.me/${phone}?text=Hola! Hemos encontrado un inconveniente con tu moto ${selectedAppt.motorcycles?.model_name || 'moto'}: ${issueReason}. Por favor contáctanos. - MotoServ`);
       } else if (isNote && notes) {
-        window.open(`https://wa.me/${phone}?text=Te adjunto el avance de tu moto en ${selectedAppt.motorcycle?.model_name || 'moto'}: ${notes}`);
+        window.open(`https://wa.me/${phone}?text=Te adjunto el avance de tu moto en ${selectedAppt.motorcycles?.model_name || 'moto'}: ${notes}`);
       }
       
       fetchAppointments();
@@ -184,6 +184,12 @@ const AdminCalendar = () => {
     }
   };
 
+  // Helper to get moto info from the joined data
+  const getMotoName = (appt) => appt.motorcycles?.model_name || 'Moto';
+  const getMotoImage = (appt) => appt.motorcycles?.image_url || '';
+  const getMotoEngine = (appt) => appt.motorcycles?.engine_size || '';
+  const getMotoBrand = (appt) => appt.motorcycles?.brands?.name || '';
+
   const renderApptCard = (appt) => {
     const isSelected = selectedAppt?.id === appt.id;
     return (
@@ -199,9 +205,15 @@ const AdminCalendar = () => {
             backgroundColor: '#f9fafb'
           }}
         >
-          <div>
+          <div style={{ flex: 1 }}>
             <div style={{ fontWeight: 'bold', fontSize: '16px' }}>{appt.appointment_time} - {appt.client_name}</div>
-            <div style={{ color: '#666', fontSize: '14px' }}>{appt.motorcycle?.model_name} | {appt.service_name}</div>
+            <div style={{ color: '#555', fontSize: '14px', marginTop: '4px' }}>
+              {appt.service_name} | {getMotoName(appt)} {getMotoEngine(appt) ? `(${getMotoEngine(appt)}cc)` : ''}
+            </div>
+            <div style={{ color: '#888', fontSize: '13px', marginTop: '2px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+              {appt.moto_color && <span>🎨 {appt.moto_color}</span>}
+              {appt.fuel_type && <span>⛽ {appt.fuel_type}</span>}
+            </div>
           </div>
           <div>
             <span style={{ 
@@ -220,8 +232,26 @@ const AdminCalendar = () => {
 
         {isSelected && (
           <div style={{ padding: '16px', borderTop: '1px solid #ddd', backgroundColor: '#fff' }}>
+            {/* Moto image + info */}
+            {getMotoImage(appt) && (
+              <div style={{ display: 'flex', gap: '16px', marginBottom: '16px', alignItems: 'center', padding: '12px', backgroundColor: '#f3f4f6', borderRadius: '8px' }}>
+                <img 
+                  src={getMotoImage(appt)} 
+                  alt={getMotoName(appt)} 
+                  style={{ width: '100px', height: '80px', objectFit: 'contain', borderRadius: '8px' }} 
+                />
+                <div>
+                  <div style={{ fontWeight: 'bold', fontSize: '16px' }}>{getMotoName(appt)}</div>
+                  <div style={{ color: '#666', fontSize: '13px' }}>{getMotoBrand(appt)} · {getMotoEngine(appt)}cc</div>
+                  {appt.moto_color && <div style={{ color: '#888', fontSize: '13px', marginTop: '2px' }}>🎨 {appt.moto_color}</div>}
+                  {appt.fuel_type && <div style={{ color: '#888', fontSize: '13px' }}>⛽ {appt.fuel_type}</div>}
+                </div>
+              </div>
+            )}
+
             <div style={{ marginBottom: '16px', fontSize: '14px', color: '#444' }}>
               <p><strong>Teléfono:</strong> {appt.client_phone}</p>
+              <p><strong>Servicio:</strong> {appt.service_name} — ${appt.service_price}</p>
               <p><strong>Observaciones:</strong> {appt.observations || 'Ninguna'}</p>
             </div>
             
@@ -235,8 +265,6 @@ const AdminCalendar = () => {
               />
             </div>
 
-
-            
             <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
               <button onClick={handleSaveNotes} className="btn-back" style={{ flex: 1, backgroundColor: '#f3f4f6' }}>
                 Guardar Notas
@@ -280,7 +308,6 @@ const AdminCalendar = () => {
       const dateStr = formatLocalYYYYMMDD(dayDate);
       
       const dayAppts = appointments.filter(a => {
-        // Handle timezone issues if any, assume YYYY-MM-DD matches
         return a.appointment_date && a.appointment_date.startsWith(dateStr);
       });
       
@@ -298,15 +325,16 @@ const AdminCalendar = () => {
                 onClick={() => openApptDetails(a)}
                 style={{ 
                   backgroundColor: getStatusColor(a.status) + '20', 
-                  padding: '8px', 
+                  padding: '6px', 
                   borderRadius: '4px', 
-                  marginBottom: '8px',
-                  fontSize: '12px',
+                  marginBottom: '6px',
+                  fontSize: '11px',
                   cursor: 'pointer',
                   borderLeft: `4px solid ${getStatusColor(a.status)}`
                 }}
               >
-                <strong>{a.appointment_time}</strong> - {a.client_name ? a.client_name.split(' ')[0] : ''}
+                <div><strong>{a.appointment_time}</strong> - {a.client_name ? a.client_name.split(' ')[0] : ''}</div>
+                <div style={{ color: '#777', fontSize: '10px' }}>{getMotoName(a)}{a.moto_color ? ` · ${a.moto_color}` : ''}</div>
               </div>
             ))
           )}

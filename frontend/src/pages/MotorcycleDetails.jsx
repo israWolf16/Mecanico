@@ -90,7 +90,7 @@ const MotorcycleDetails = () => {
   }
 
   const brandName = data.motorcycle.brands?.name || 'Desconocida';
-  const brandColor = getBrandColor(brandName);
+  const brandColor = data.motorcycle.accent_color || getBrandColor(brandName);
 
   return (
     <div className="container animate-fade-in" style={{ '--brand-color': brandColor }}>

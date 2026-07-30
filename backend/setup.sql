@@ -99,6 +99,8 @@ CREATE TABLE appointments (
     client_name TEXT NOT NULL,
     client_phone TEXT NOT NULL,
     observations TEXT,
+    moto_color TEXT,
+    fuel_type TEXT,
     appointment_date DATE NOT NULL,
     appointment_time TIME NOT NULL,
     status TEXT DEFAULT 'pendiente' CHECK (status IN ('pendiente','terminada','inconveniente')),
