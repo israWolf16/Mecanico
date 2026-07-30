@@ -104,7 +104,7 @@ const AdminCalendar = () => {
   const openApptDetails = (appt) => {
     setSelectedAppt(appt.id === selectedAppt?.id ? null : appt);
     setNotes(appt.mechanic_notes || '');
-    setEvidence(appt.evidence_urls ? appt.evidence_urls.join(', ') : '');
+    setEvidence(appt.evidence_images ? appt.evidence_images.join(', ') : '');
   };
 
   const updateAppt = async (statusUpdate = null, issueReason = null) => {
@@ -114,7 +114,7 @@ const AdminCalendar = () => {
       
       const payload = {
         mechanic_notes: notes,
-        evidence_urls: evidence.split(',').map(e => e.trim()).filter(e => e)
+        evidence_images: evidence.split(',').map(e => e.trim()).filter(e => e)
       };
       
       if (statusUpdate) {
