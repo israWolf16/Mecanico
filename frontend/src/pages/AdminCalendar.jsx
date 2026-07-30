@@ -160,6 +160,20 @@ const AdminCalendar = () => {
     updateAppt();
   };
 
+  const handleDeleteAppt = async () => {
+    if (!window.confirm('¿Seguro que deseas eliminar esta cita de forma permanente?')) return;
+    try {
+      const token = localStorage.getItem('adminToken');
+      const headers = { Authorization: `Bearer ${token}` };
+      await axios.delete(`${API_URL}/appointments/${selectedAppt.id}`, { headers });
+      fetchAppointments();
+      setSelectedAppt(null);
+    } catch (err) {
+      console.error(err);
+      alert('Error al eliminar la cita');
+    }
+  };
+
   const getStatusColor = (status) => {
     switch (status) {
       case 'terminada': return '#22c55e';
@@ -240,6 +254,9 @@ const AdminCalendar = () => {
               </button>
               <button onClick={handleMarkIssue} className="btn-back" style={{ flex: 1, backgroundColor: '#f97316', color: 'white', borderColor: '#f97316' }}>
                 <AlertTriangle size={16} /> Inconveniente
+              </button>
+              <button onClick={handleDeleteAppt} className="btn-back" style={{ flex: 1, backgroundColor: '#ef4444', color: 'white', borderColor: '#ef4444' }}>
+                <Trash2 size={16} /> Eliminar
               </button>
             </div>
           </div>

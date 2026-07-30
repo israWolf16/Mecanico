@@ -275,4 +275,20 @@ router.patch('/motorcycles/:id', checkAuth, async (req, res) => {
     }
 });
 
+// 16. Eliminar cita (admin)
+router.delete('/appointments/:id', checkAuth, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { error } = await supabase
+            .from('appointments')
+            .delete()
+            .eq('id', id);
+        if (error) throw error;
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error al eliminar cita:', error);
+        res.status(500).json({ error: 'Error al eliminar la cita' });
+    }
+});
+
 module.exports = router;
