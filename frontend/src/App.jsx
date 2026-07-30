@@ -1,12 +1,15 @@
 import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import { Wrench, ShieldCheck } from 'lucide-react';
+import { Wrench, ShieldCheck, LayoutDashboard } from 'lucide-react';
 import Home from './pages/Home';
 import MotorcycleDetails from './pages/MotorcycleDetails';
 import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
+import AppointmentForm from './pages/AppointmentForm';
 import './index.css';
 
 function App() {
+  const isLoggedIn = !!localStorage.getItem('adminToken');
+
   return (
     <Router>
       <header className="app-header">
@@ -14,9 +17,15 @@ function App() {
           <Wrench size={28} color="#ffffff" />
           <h1>MOTOSERV</h1>
         </Link>
-        <Link to="/login" style={{ color: 'white', display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', fontFamily: 'Oswald', fontSize: '14px', textTransform: 'uppercase' }}>
-          <ShieldCheck size={18} /> Acceso Mecánico
-        </Link>
+        {isLoggedIn ? (
+          <Link to="/admin" style={{ color: 'white', display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', fontFamily: 'Oswald', fontSize: '14px', textTransform: 'uppercase' }}>
+            <LayoutDashboard size={18} /> Panel Admin
+          </Link>
+        ) : (
+          <Link to="/login" style={{ color: 'white', display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', fontFamily: 'Oswald', fontSize: '14px', textTransform: 'uppercase' }}>
+            <ShieldCheck size={18} /> Acceso Mecánico
+          </Link>
+        )}
       </header>
       <main>
         <Routes>
@@ -24,6 +33,7 @@ function App() {
           <Route path="/moto/:id" element={<MotorcycleDetails />} />
           <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/agendar" element={<AppointmentForm />} />
         </Routes>
       </main>
     </Router>

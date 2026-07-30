@@ -159,4 +159,120 @@ router.get('/services', async (req, res) => {
     }
 });
 
+// 9. Crear cita (público)
+router.post('/appointments', async (req, res) => {
+    try {
+        const { motorcycle_id, service_name, service_price, client_name, client_phone, observations, appointment_date, appointment_time } = req.body;
+        const { data, error } = await supabase
+            .from('appointments')
+            .insert([{ motorcycle_id, service_name, service_price, client_name, client_phone, observations, appointment_date, appointment_time }])
+            .select();
+        if (error) throw error;
+        res.json(data[0]);
+    } catch (error) {
+        console.error('Error al crear cita:', error);
+        res.status(500).json({ error: 'Error al crear la cita' });
+    }
+});
+
+// 10. Obtener días bloqueados (público)
+router.get('/blocked-dates', async (req, res) => {
+    try {
+        const { data, error } = await supabase.from('blocked_dates').select('*');
+        if (error) throw error;
+        res.json(data);
+    } catch (error) {
+        console.error('Error al obtener días bloqueados:', error);
+        res.status(500).json({ error: 'Error al obtener días bloqueados' });
+    }
+});
+
+// 11. Obtener citas (admin) - por fecha o rango
+router.get('/appointments', checkAuth, async (req, res) => {
+    try {
+        const { date, start_date, end_date } = req.query;
+        let query = supabase.from('appointments').select('*, motorcycles(model_name, engine_size, image_url, brands(name))');
+        if (date) {
+            query = query.eq('appointment_date', date);
+        } else if (start_date && end_date) {
+            query = query.gte('appointment_date', start_date).lte('appointment_date', end_date);
+        }
+        query = query.order('appointment_date', { ascending: true }).order('appointment_time', { ascending: true });
+        const { data, error } = await query;
+        if (error) throw error;
+        res.json(data);
+    } catch (error) {
+        console.error('Error al obtener citas:', error);
+        res.status(500).json({ error: 'Error al obtener citas' });
+    }
+});
+
+// 12. Actualizar cita (admin) - estado, evidencia, notas
+router.patch('/appointments/:id', checkAuth, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const updates = req.body;
+        const { data, error } = await supabase
+            .from('appointments')
+            .update(updates)
+            .eq('id', id)
+            .select();
+        if (error) throw error;
+        res.json(data[0]);
+    } catch (error) {
+        console.error('Error al actualizar cita:', error);
+        res.status(500).json({ error: 'Error al actualizar la cita' });
+    }
+});
+
+// 13. Bloquear un día (admin)
+router.post('/blocked-dates', checkAuth, async (req, res) => {
+    try {
+        const { blocked_date, reason } = req.body;
+        const { data, error } = await supabase
+            .from('blocked_dates')
+            .insert([{ blocked_date, reason }])
+            .select();
+        if (error) throw error;
+        res.json(data[0]);
+    } catch (error) {
+        console.error('Error al bloquear día:', error);
+        res.status(500).json({ error: 'Error al bloquear día' });
+    }
+});
+
+// 14. Desbloquear un día (admin)
+router.delete('/blocked-dates/:id', checkAuth, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { error } = await supabase
+            .from('blocked_dates')
+            .delete()
+            .eq('id', id);
+        if (error) throw error;
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error al desbloquear día:', error);
+        res.status(500).json({ error: 'Error al desbloquear día' });
+    }
+});
+
+// 15. Editar moto (admin)
+router.patch('/motorcycles/:id', checkAuth, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const updates = req.body;
+        const { data, error } = await supabase
+            .from('motorcycles')
+            .update(updates)
+            .eq('id', id)
+            .select();
+        if (error) throw error;
+        res.json(data[0]);
+    } catch (error) {
+        console.error('Error al editar moto:', error);
+        res.status(500).json({ error: 'Error al editar la moto' });
+    }
+});
+
 module.exports = router;

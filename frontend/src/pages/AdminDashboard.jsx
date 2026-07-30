@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Trash2, Plus, ArrowLeft } from 'lucide-react';
+import { Trash2, Plus, Edit3, Search } from 'lucide-react';
+import AdminCalendar from './AdminCalendar';
+import EditMotoModal from '../components/EditMotoModal';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
@@ -11,10 +13,13 @@ const AdminDashboard = () => {
   const [brands, setBrands] = useState([]);
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('catalogo');
 
   // Form states
   const [newMoto, setNewMoto] = useState({ brand_id: '', model_name: '', engine_size: '', image_url: '' });
   const [newServicePrice, setNewServicePrice] = useState({ motorcycle_id: '', service_id: '', price: '' });
+  const [brandSearch, setBrandSearch] = useState('');
+  const [editingMoto, setEditingMoto] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem('adminToken');
@@ -38,9 +43,7 @@ const AdminDashboard = () => {
       setLoading(false);
     } catch (error) {
       console.error('Error fetching admin data:', error);
-      if (error.response && error.response.status === 403) {
-        navigate('/login');
-      }
+      setLoading(false);
     }
   };
 
@@ -58,6 +61,7 @@ const AdminDashboard = () => {
       });
       alert('Moto agregada correctamente');
       setNewMoto({ brand_id: '', model_name: '', engine_size: '', image_url: '' });
+      setBrandSearch('');
       fetchData();
     } catch (error) {
       console.error(error);
@@ -95,74 +99,127 @@ const AdminDashboard = () => {
     }
   };
 
+  // Filtered brands for searchable select
+  const filteredBrands = brands.filter(b =>
+    b.name.toLowerCase().includes(brandSearch.toLowerCase())
+  );
+
   if (loading) return <div className="loader-container"><div className="loader"></div></div>;
 
   return (
     <div className="container" style={{ padding: '40px 20px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
         <h1 style={{ fontFamily: 'Oswald', textTransform: 'uppercase' }}>Panel de Administración</h1>
         <button onClick={handleLogout} className="btn-back">Cerrar Sesión</button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }}>
-        {/* Formulario Agregar Moto */}
-        <div className="moto-showcase" style={{ textAlign: 'left', padding: '24px' }}>
-          <h2 style={{ fontFamily: 'Oswald', marginBottom: '20px' }}><Plus size={20} style={{ verticalAlign: 'middle', marginRight: '8px' }}/> Agregar Nueva Moto</h2>
-          <form onSubmit={handleAddMoto} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <select className="search-input" style={{ paddingLeft: '16px' }} value={newMoto.brand_id} onChange={e => setNewMoto({...newMoto, brand_id: e.target.value})} required>
-              <option value="">Selecciona una Marca</option>
-              {brands.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-            </select>
-            <input type="text" placeholder="Nombre del Modelo" className="search-input" style={{ paddingLeft: '16px' }} value={newMoto.model_name} onChange={e => setNewMoto({...newMoto, model_name: e.target.value})} required />
-            <input type="number" placeholder="Cilindraje (CC)" className="search-input" style={{ paddingLeft: '16px' }} value={newMoto.engine_size} onChange={e => setNewMoto({...newMoto, engine_size: e.target.value})} required />
-            <input type="url" placeholder="URL de la imagen" className="search-input" style={{ paddingLeft: '16px' }} value={newMoto.image_url} onChange={e => setNewMoto({...newMoto, image_url: e.target.value})} required />
-            <button type="submit" className="btn-back" style={{ background: 'var(--color-primary)', color: 'white' }}>Agregar Moto</button>
-          </form>
-        </div>
-
-        {/* Formulario Asignar Precio a Servicio */}
-        <div className="moto-showcase" style={{ textAlign: 'left', padding: '24px' }}>
-          <h2 style={{ fontFamily: 'Oswald', marginBottom: '20px' }}><Plus size={20} style={{ verticalAlign: 'middle', marginRight: '8px' }}/> Asignar Precio a Servicio</h2>
-          <form onSubmit={handleAddServicePrice} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <select className="search-input" style={{ paddingLeft: '16px' }} value={newServicePrice.motorcycle_id} onChange={e => setNewServicePrice({...newServicePrice, motorcycle_id: e.target.value})} required>
-              <option value="">Selecciona una Moto</option>
-              {motorcycles.map(m => <option key={m.id} value={m.id}>{m.model_name}</option>)}
-            </select>
-            <select className="search-input" style={{ paddingLeft: '16px' }} value={newServicePrice.service_id} onChange={e => setNewServicePrice({...newServicePrice, service_id: e.target.value})} required>
-              <option value="">Selecciona un Servicio</option>
-              {services.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-            </select>
-            <input type="number" placeholder="Precio ($)" className="search-input" style={{ paddingLeft: '16px' }} value={newServicePrice.price} onChange={e => setNewServicePrice({...newServicePrice, price: e.target.value})} required />
-            <button type="submit" className="btn-back" style={{ background: 'var(--color-primary)', color: 'white' }}>Asignar Precio</button>
-          </form>
-        </div>
+      {/* Tabs */}
+      <div className="admin-tabs">
+        <button className={`admin-tab ${activeTab === 'catalogo' ? 'active' : ''}`} onClick={() => setActiveTab('catalogo')}>
+          Catálogo
+        </button>
+        <button className={`admin-tab ${activeTab === 'calendario' ? 'active' : ''}`} onClick={() => setActiveTab('calendario')}>
+          Calendario
+        </button>
       </div>
 
-      <h2 style={{ fontFamily: 'Oswald', marginTop: '60px', marginBottom: '20px' }}>Motos Registradas</h2>
-      <div style={{ background: 'white', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-          <thead style={{ background: 'var(--color-surface-2)', borderBottom: '2px solid var(--color-border)' }}>
-            <tr>
-              <th style={{ padding: '16px' }}>Modelo</th>
-              <th style={{ padding: '16px' }}>Cilindraje</th>
-              <th style={{ padding: '16px' }}>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {motorcycles.map(moto => (
-              <tr key={moto.id} style={{ borderBottom: '1px solid var(--color-border)' }}>
-                <td style={{ padding: '16px' }}>{moto.model_name}</td>
-                <td style={{ padding: '16px' }}>{moto.engine_size} cc</td>
-                <td style={{ padding: '16px' }}>
-                  <button onClick={() => handleDeleteMoto(moto.id)} style={{ background: 'transparent', border: 'none', color: '#dc2626', cursor: 'pointer' }}>
-                    <Trash2 size={20} />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {activeTab === 'catalogo' ? (
+        <>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }}>
+            {/* Formulario Agregar Moto */}
+            <div className="moto-showcase" style={{ textAlign: 'left', padding: '24px' }}>
+              <h2 style={{ fontFamily: 'Oswald', marginBottom: '20px' }}><Plus size={20} style={{ verticalAlign: 'middle', marginRight: '8px' }}/> Agregar Nueva Moto</h2>
+              <form onSubmit={handleAddMoto} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {/* Searchable brand select */}
+                <div className="form-group">
+                  <label className="form-label"><Search size={14} /> Marca</label>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type="text"
+                      className="search-input"
+                      style={{ paddingLeft: '16px' }}
+                      placeholder="Buscar marca..."
+                      value={brandSearch}
+                      onChange={e => { setBrandSearch(e.target.value); setNewMoto({...newMoto, brand_id: ''}); }}
+                    />
+                    {brandSearch && !newMoto.brand_id && filteredBrands.length > 0 && (
+                      <div className="brand-dropdown">
+                        {filteredBrands.map(b => (
+                          <div key={b.id} className="brand-dropdown-item" onClick={() => { setNewMoto({...newMoto, brand_id: b.id}); setBrandSearch(b.name); }}>
+                            {b.name}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <input type="text" placeholder="Nombre del Modelo" className="search-input" style={{ paddingLeft: '16px' }} value={newMoto.model_name} onChange={e => setNewMoto({...newMoto, model_name: e.target.value})} required />
+                <input type="number" placeholder="Cilindraje (CC)" className="search-input" style={{ paddingLeft: '16px' }} value={newMoto.engine_size} onChange={e => setNewMoto({...newMoto, engine_size: e.target.value})} required />
+                <input type="url" placeholder="URL de la imagen" className="search-input" style={{ paddingLeft: '16px' }} value={newMoto.image_url} onChange={e => setNewMoto({...newMoto, image_url: e.target.value})} required />
+                <button type="submit" className="btn-back" style={{ background: 'var(--color-primary)', color: 'white' }}>Agregar Moto</button>
+              </form>
+            </div>
+
+            {/* Formulario Asignar Precio a Servicio */}
+            <div className="moto-showcase" style={{ textAlign: 'left', padding: '24px' }}>
+              <h2 style={{ fontFamily: 'Oswald', marginBottom: '20px' }}><Plus size={20} style={{ verticalAlign: 'middle', marginRight: '8px' }}/> Asignar Precio a Servicio</h2>
+              <form onSubmit={handleAddServicePrice} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <select className="search-input" style={{ paddingLeft: '16px' }} value={newServicePrice.motorcycle_id} onChange={e => setNewServicePrice({...newServicePrice, motorcycle_id: e.target.value})} required>
+                  <option value="">Selecciona una Moto</option>
+                  {motorcycles.map(m => <option key={m.id} value={m.id}>{m.model_name}</option>)}
+                </select>
+                <select className="search-input" style={{ paddingLeft: '16px' }} value={newServicePrice.service_id} onChange={e => setNewServicePrice({...newServicePrice, service_id: e.target.value})} required>
+                  <option value="">Selecciona un Servicio</option>
+                  {services.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                </select>
+                <input type="number" placeholder="Precio ($)" className="search-input" style={{ paddingLeft: '16px' }} value={newServicePrice.price} onChange={e => setNewServicePrice({...newServicePrice, price: e.target.value})} required />
+                <button type="submit" className="btn-back" style={{ background: 'var(--color-primary)', color: 'white' }}>Asignar Precio</button>
+              </form>
+            </div>
+          </div>
+
+          <h2 style={{ fontFamily: 'Oswald', marginTop: '60px', marginBottom: '20px' }}>Motos Registradas</h2>
+          <div style={{ background: 'white', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+              <thead style={{ background: 'var(--color-surface-2)', borderBottom: '2px solid var(--color-border)' }}>
+                <tr>
+                  <th style={{ padding: '16px' }}>Modelo</th>
+                  <th style={{ padding: '16px' }}>Cilindraje</th>
+                  <th style={{ padding: '16px' }}>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {motorcycles.map(moto => (
+                  <tr key={moto.id} style={{ borderBottom: '1px solid var(--color-border)' }}>
+                    <td style={{ padding: '16px' }}>{moto.model_name}</td>
+                    <td style={{ padding: '16px' }}>{moto.engine_size} cc</td>
+                    <td style={{ padding: '16px', display: 'flex', gap: '12px' }}>
+                      <button onClick={() => setEditingMoto(moto)} style={{ background: 'transparent', border: 'none', color: 'var(--color-primary)', cursor: 'pointer' }}>
+                        <Edit3 size={20} />
+                      </button>
+                      <button onClick={() => handleDeleteMoto(moto.id)} style={{ background: 'transparent', border: 'none', color: '#dc2626', cursor: 'pointer' }}>
+                        <Trash2 size={20} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      ) : (
+        <AdminCalendar />
+      )}
+
+      {/* Edit Modal */}
+      {editingMoto && (
+        <EditMotoModal
+          moto={editingMoto}
+          services={services}
+          onClose={() => setEditingMoto(null)}
+          onSaved={fetchData}
+        />
+      )}
     </div>
   );
 };

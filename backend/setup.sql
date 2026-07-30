@@ -1,6 +1,8 @@
 -- Script de configuración para Supabase PostgreSQL (Versión Segura)
 
 -- Eliminar tablas si ya existen (para evitar errores si se ejecuta más de una vez)
+DROP TABLE IF EXISTS appointments;
+DROP TABLE IF EXISTS blocked_dates;
 DROP TABLE IF EXISTS motorcycle_services;
 DROP TABLE IF EXISTS services;
 DROP TABLE IF EXISTS motorcycles;
@@ -19,7 +21,8 @@ CREATE TABLE motorcycles (
     brand_id UUID REFERENCES brands(id) ON DELETE CASCADE,
     model_name TEXT NOT NULL,
     engine_size INTEGER,
-    image_url TEXT
+    image_url TEXT,
+    accent_color TEXT
 );
 
 -- 3. Crear tabla de servicios
@@ -87,3 +90,25 @@ SELECT
         ELSE 500.00
     END
 FROM inserted_motos m CROSS JOIN inserted_services s;
+
+CREATE TABLE appointments (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    motorcycle_id UUID REFERENCES motorcycles(id) ON DELETE SET NULL,
+    service_name TEXT NOT NULL,
+    service_price NUMERIC(10,2),
+    client_name TEXT NOT NULL,
+    client_phone TEXT NOT NULL,
+    observations TEXT,
+    appointment_date DATE NOT NULL,
+    appointment_time TIME NOT NULL,
+    status TEXT DEFAULT 'pendiente' CHECK (status IN ('pendiente','terminada','inconveniente')),
+    evidence_images TEXT[],
+    mechanic_notes TEXT,
+    created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE blocked_dates (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    blocked_date DATE NOT NULL UNIQUE,
+    reason TEXT
+);

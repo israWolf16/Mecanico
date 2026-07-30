@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { ArrowLeft, ChevronRight, Settings } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Settings, CalendarDays } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
@@ -70,6 +70,17 @@ const MotorcycleDetails = () => {
     fetchDetails();
   }, [id]);
 
+  const handleBookService = (serviceName, servicePrice) => {
+    const params = new URLSearchParams({
+      motoId: id,
+      motoName: data.motorcycle.model_name,
+      engineSize: data.motorcycle.engine_size,
+      serviceName,
+      servicePrice
+    });
+    navigate(`/agendar?${params.toString()}`);
+  };
+
   if (loading) {
     return (
       <div className="loader-container">
@@ -111,13 +122,16 @@ const MotorcycleDetails = () => {
           <div className="services-list">
             {data.services && data.services.length > 0 ? (
               data.services.map((item, index) => (
-                <div key={index} className="service-item">
+                <div key={index} className="service-item" style={{ cursor: 'pointer' }} onClick={() => handleBookService(item.services.name, item.price)}>
                   <div className="service-info">
                     <h3>{item.services.name}</h3>
                     <p>{item.services.description}</p>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <div className="service-price">${item.price}</div>
+                    <button className="btn-agendar" onClick={(e) => { e.stopPropagation(); handleBookService(item.services.name, item.price); }}>
+                      <CalendarDays size={14} /> Agendar
+                    </button>
                     <ChevronRight color="#999" />
                   </div>
                 </div>
