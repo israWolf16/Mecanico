@@ -22,6 +22,13 @@ const AdminCalendar = () => {
     fetchBlockedDates();
   }, [currentDate, view]);
 
+  const formatLocalYYYYMMDD = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const fetchAppointments = async () => {
     try {
       const token = localStorage.getItem('adminToken');
@@ -29,7 +36,7 @@ const AdminCalendar = () => {
       
       let url = '';
       if (view === 'day') {
-        const dateStr = currentDate.toISOString().split('T')[0];
+        const dateStr = formatLocalYYYYMMDD(currentDate);
         url = `${API_URL}/appointments?date=${dateStr}`;
       } else {
         const startOfWeek = new Date(currentDate);
@@ -37,8 +44,8 @@ const AdminCalendar = () => {
         const endOfWeek = new Date(startOfWeek);
         endOfWeek.setDate(startOfWeek.getDate() + 6);
         
-        const startStr = startOfWeek.toISOString().split('T')[0];
-        const endStr = endOfWeek.toISOString().split('T')[0];
+        const startStr = formatLocalYYYYMMDD(startOfWeek);
+        const endStr = formatLocalYYYYMMDD(endOfWeek);
         url = `${API_URL}/appointments?start_date=${startStr}&end_date=${endStr}`;
       }
       
@@ -261,7 +268,7 @@ const AdminCalendar = () => {
     for (let i = 0; i < 7; i++) {
       const dayDate = new Date(startOfWeek);
       dayDate.setDate(startOfWeek.getDate() + i);
-      const dateStr = dayDate.toISOString().split('T')[0];
+      const dateStr = formatLocalYYYYMMDD(dayDate);
       
       const dayAppts = appointments.filter(a => {
         // Handle timezone issues if any, assume YYYY-MM-DD matches

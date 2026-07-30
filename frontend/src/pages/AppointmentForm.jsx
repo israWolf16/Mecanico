@@ -24,9 +24,16 @@ const AppointmentForm = () => {
     axios.get(`${API_URL}/blocked-dates`).then(r => setBlockedDates(r.data.map(d => d.blocked_date))).catch(() => {});
   }, []);
 
+  const formatLocalYYYYMMDD = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const today = new Date();
-  const minDate = today.toISOString().split('T')[0];
-  const maxDate = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+  const minDate = formatLocalYYYYMMDD(today);
+  const maxDate = formatLocalYYYYMMDD(new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000));
 
   const isDateBlocked = (dateStr) => blockedDates.includes(dateStr);
 
