@@ -12,6 +12,7 @@ router.get('/motorcycles', async (req, res) => {
                 model_name,
                 engine_size,
                 image_url,
+                accent_color,
                 brands ( id, name, logo_url )
             `);
         
@@ -35,6 +36,7 @@ router.get('/motorcycles/:id/services', async (req, res) => {
                 model_name,
                 engine_size,
                 image_url,
+                accent_color,
                 brands ( id, name )
             `)
             .eq('id', id)

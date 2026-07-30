@@ -1,4 +1,5 @@
-import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { HashRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { Wrench, ShieldCheck, LayoutDashboard } from 'lucide-react';
 import Home from './pages/Home';
 import MotorcycleDetails from './pages/MotorcycleDetails';
@@ -7,11 +8,25 @@ import AdminDashboard from './pages/AdminDashboard';
 import AppointmentForm from './pages/AppointmentForm';
 import './index.css';
 
-function App() {
-  const isLoggedIn = !!localStorage.getItem('adminToken');
+// Inner component that has access to useLocation (inside Router)
+function AppContent() {
+  const location = useLocation();
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('adminToken'));
+
+  // Re-check token on every route change
+  useEffect(() => {
+    setIsLoggedIn(!!localStorage.getItem('adminToken'));
+  }, [location]);
+
+  // Listen for storage changes (login/logout from other tabs or same tab)
+  useEffect(() => {
+    const handleStorage = () => setIsLoggedIn(!!localStorage.getItem('adminToken'));
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, []);
 
   return (
-    <Router>
+    <>
       <header className="app-header">
         <Link to="/" className="brand">
           <Wrench size={28} color="#ffffff" />
@@ -36,6 +51,14 @@ function App() {
           <Route path="/agendar" element={<AppointmentForm />} />
         </Routes>
       </main>
+    </>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppContent />
     </Router>
   );
 }
