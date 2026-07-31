@@ -211,7 +211,7 @@ const AdminCalendar = () => {
               {appt.service_name} | {getMotoName(appt)} {getMotoEngine(appt) ? `(${getMotoEngine(appt)}cc)` : ''}
             </div>
             <div style={{ color: '#888', fontSize: '13px', marginTop: '2px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-              {appt.moto_color && <span>🎨 {appt.moto_color}</span>}
+              {appt.moto_color && <span>⭕ {appt.moto_color}</span>}
               {appt.fuel_type && <span>⛽ {appt.fuel_type}</span>}
             </div>
           </div>
@@ -243,7 +243,7 @@ const AdminCalendar = () => {
                 <div>
                   <div style={{ fontWeight: 'bold', fontSize: '16px' }}>{getMotoName(appt)}</div>
                   <div style={{ color: '#666', fontSize: '13px' }}>{getMotoBrand(appt)} · {getMotoEngine(appt)}cc</div>
-                  {appt.moto_color && <div style={{ color: '#888', fontSize: '13px', marginTop: '2px' }}>🎨 {appt.moto_color}</div>}
+                  {appt.moto_color && <div style={{ color: '#888', fontSize: '13px', marginTop: '2px' }}>⭕ {appt.moto_color}</div>}
                   {appt.fuel_type && <div style={{ color: '#888', fontSize: '13px' }}>⛽ {appt.fuel_type}</div>}
                 </div>
               </div>
