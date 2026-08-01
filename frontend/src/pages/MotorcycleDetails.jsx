@@ -7,7 +7,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
 const BRAND_COLORS = {
   bajaj: '#00a19b', yamaha: '#0039a6', honda: '#e60012',
-  suzuki: '#005ca9', vento: '#ff6f00', italika: '#d4145a', kawasaki: '#6dc066',
+  suzuki: '#005ca9', vento: '#ff6f00', italika: '#d4145a', kawasaki: '#6dc066', cfmoto: '#19b2e6',
 };
 
 const getBrandColor = (brandName) => {

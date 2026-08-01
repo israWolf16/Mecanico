@@ -4,7 +4,7 @@ import MotorcycleCard from '../components/MotorcycleCard';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
-const BRANDS = ['todos', 'bajaj', 'yamaha', 'honda', 'suzuki', 'vento', 'italika', 'kawasaki'];
+const BRANDS = ['todos', 'bajaj', 'yamaha', 'honda', 'suzuki', 'vento', 'italika', 'kawasaki', 'cfmoto'];
 
 const Home = () => {
   const [motorcycles, setMotorcycles] = useState([]);

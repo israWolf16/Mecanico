@@ -9,6 +9,7 @@ const BRAND_COLORS = {
   vento:    '#ff6f00',
   italika:  '#d4145a',
   kawasaki: '#6dc066',
+  cfmoto:   '#19b2e6',
 };
 
 const getBrandColor = (brandName) => {
