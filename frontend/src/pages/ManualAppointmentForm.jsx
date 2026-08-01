@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { CalendarDays, Phone, User, FileText, ArrowLeft, CheckCircle, Palette, Fuel } from 'lucide-react';
+import { CalendarDays, Phone, User, FileText, ArrowLeft, CheckCircle, Palette, Fuel, Bike, Image, Gauge } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
@@ -9,16 +9,17 @@ const COLORES = [
   'Roja', 'Negra', 'Blanca', 'Azul', 'Gris', 'Amarilla', 'Verde', 'Naranja', 'Morada', 'Rosa', 'Plateada', 'Dorada'
 ];
 
-const AppointmentForm = () => {
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-  
-  const motoId = searchParams.get('motoId');
-  const motoName = searchParams.get('motoName') || '';
-  const engineSize = searchParams.get('engineSize') || '';
-  const serviceName = searchParams.get('serviceName') || '';
-  const servicePrice = searchParams.get('servicePrice') || '';
+const SERVICIOS_MANUAL = [
+  { name: 'Afinación Básica', price: 400 },
+  { name: 'Afinación Completa', price: 800 },
+  { name: 'Chequeo General', price: 100 },
+];
 
+const ManualAppointmentForm = () => {
+  const navigate = useNavigate();
+
+  const [motoInfo, setMotoInfo] = useState({ brand: '', model_name: '', engine_size: '', image_url: '' });
+  const [selectedService, setSelectedService] = useState('');
   const [form, setForm] = useState({ client_name: '', client_phone: '', observations: '', appointment_date: '', appointment_time: '' });
   const [color1, setColor1] = useState('');
   const [color2, setColor2] = useState('');
@@ -44,16 +45,26 @@ const AppointmentForm = () => {
 
   const isDateBlocked = (dateStr) => blockedDates.includes(dateStr);
 
-  // Generate time slots from 9:00 to 17:00 (last slot at 17:00, end at 18:00)
   const timeSlots = [];
   for (let h = 9; h <= 17; h++) {
     timeSlots.push(`${String(h).padStart(2,'0')}:00`);
     if (h < 17) timeSlots.push(`${String(h).padStart(2,'0')}:30`);
   }
 
+  const getServiceObj = () => SERVICIOS_MANUAL.find(s => s.name === selectedService);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+
+    if (!motoInfo.brand.trim() || !motoInfo.model_name.trim() || !motoInfo.engine_size) {
+      setError('Por favor llena los datos de tu moto (Marca, Modelo y Cilindraje).');
+      return;
+    }
+    if (!selectedService) {
+      setError('Selecciona un servicio.');
+      return;
+    }
     if (!color1) {
       setError('Por favor selecciona al menos un color de tu moto.');
       return;
@@ -66,18 +77,28 @@ const AppointmentForm = () => {
       setError('Ese día no está disponible. Por favor elige otro.');
       return;
     }
+
     const motoColor = color2 ? `${color1} con ${color2}` : color1;
+    const svc = getServiceObj();
     const fullPhone = form.client_phone.replace(/\D/g, '');
     const phoneWith52 = fullPhone.startsWith('52') ? fullPhone : '52' + fullPhone;
+
+    // Add observation with manual moto info
+    const motoDesc = `[MOTO MANUAL] ${motoInfo.brand} ${motoInfo.model_name} ${motoInfo.engine_size}cc${motoInfo.image_url ? ' | Img: ' + motoInfo.image_url : ''}`;
+    const fullObservations = motoDesc + (form.observations ? '\n' + form.observations : '');
+
     try {
       await axios.post(`${API_URL}/appointments`, {
-        motorcycle_id: motoId,
-        service_name: serviceName,
-        service_price: parseFloat(servicePrice),
+        motorcycle_id: null,
+        service_name: svc.name,
+        service_price: svc.price,
         moto_color: motoColor,
         fuel_type: fuelType,
-        ...form,
-        client_phone: phoneWith52
+        client_name: form.client_name,
+        client_phone: phoneWith52,
+        observations: fullObservations,
+        appointment_date: form.appointment_date,
+        appointment_time: form.appointment_time
       });
       setSubmitted(true);
     } catch (err) {
@@ -93,7 +114,7 @@ const AppointmentForm = () => {
             <CheckCircle size={64} color="#22c55e" />
           </div>
           <h2 style={{ fontFamily: 'Oswald', textTransform: 'uppercase', marginBottom: '16px', fontSize: '24px', color: '#22c55e' }}>¡Cita Agendada!</h2>
-          <p style={{ color: '#666', marginBottom: '24px' }}>Tu cita para <strong>{serviceName}</strong> en tu <strong>{motoName}</strong> ha sido registrada exitosamente. Te contactaremos por WhatsApp para confirmar.</p>
+          <p style={{ color: '#666', marginBottom: '24px' }}>Tu cita para <strong>{selectedService}</strong> en tu <strong>{motoInfo.brand} {motoInfo.model_name}</strong> ha sido registrada exitosamente. Te contactaremos por WhatsApp para confirmar.</p>
           <button className="btn-back" onClick={() => navigate('/')} style={{ margin: '0 auto' }}>
             <ArrowLeft size={16} /> Volver al catálogo
           </button>
@@ -109,25 +130,53 @@ const AppointmentForm = () => {
       </button>
 
       <div className="moto-showcase" style={{ textAlign: 'left', padding: '30px' }}>
-        <h2 style={{ fontFamily: 'Oswald', textTransform: 'uppercase', marginBottom: '24px', fontSize: '22px' }}>
-          <CalendarDays size={22} style={{ verticalAlign: 'middle', marginRight: '8px' }} /> Agendar Cita
+        <h2 style={{ fontFamily: 'Oswald', textTransform: 'uppercase', marginBottom: '8px', fontSize: '22px' }}>
+          <CalendarDays size={22} style={{ verticalAlign: 'middle', marginRight: '8px' }} /> Agendar Cita Manual
         </h2>
-
-        {/* Pre-loaded data */}
-        <div className="appointment-preloaded">
-          <div className="preloaded-item">
-            <span className="preloaded-label">Modelo</span>
-            <span className="preloaded-value">{motoName} — {engineSize}cc</span>
-          </div>
-          <div className="preloaded-item">
-            <span className="preloaded-label">Servicio</span>
-            <span className="preloaded-value">{serviceName} — ${servicePrice}</span>
-          </div>
-        </div>
+        <p style={{ color: '#888', fontSize: '14px', marginBottom: '24px' }}>Llena los datos de tu moto manualmente para agendar tu cita.</p>
 
         {error && <div className="error-banner">{error}</div>}
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {/* Sección datos de la moto */}
+          <div style={{ background: '#f9fafb', padding: '16px', borderRadius: '8px', border: '1px solid #eee' }}>
+            <h3 style={{ fontFamily: 'Oswald', fontSize: '16px', marginBottom: '12px', textTransform: 'uppercase', color: 'var(--color-primary)' }}>🏍️ Datos de tu moto</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div className="form-group">
+                <label className="form-label"><Bike size={14} /> Marca</label>
+                <input type="text" className="search-input" style={{ paddingLeft: '16px' }} placeholder="Ej: Yamaha, Honda, Bajaj..." value={motoInfo.brand} onChange={e => setMotoInfo({...motoInfo, brand: e.target.value})} required />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Nombre del Modelo</label>
+                <input type="text" className="search-input" style={{ paddingLeft: '16px' }} placeholder="Ej: FZ-S 3.0, Pulsar NS 200..." value={motoInfo.model_name} onChange={e => setMotoInfo({...motoInfo, model_name: e.target.value})} required />
+              </div>
+              <div className="form-group">
+                <label className="form-label"><Gauge size={14} /> Cilindraje (CC)</label>
+                <input type="number" className="search-input" style={{ paddingLeft: '16px' }} placeholder="Ej: 150, 200, 250..." value={motoInfo.engine_size} onChange={e => setMotoInfo({...motoInfo, engine_size: e.target.value})} required />
+              </div>
+              <div className="form-group">
+                <label className="form-label"><Image size={14} /> URL de la imagen (opcional)</label>
+                <input type="url" className="search-input" style={{ paddingLeft: '16px' }} placeholder="https://ejemplo.com/mi-moto.jpg" value={motoInfo.image_url} onChange={e => setMotoInfo({...motoInfo, image_url: e.target.value})} />
+                <span style={{ fontSize: '11px', color: '#999', marginTop: '4px', display: 'block' }}>Debe ser un enlace directo a una imagen (.jpg, .png, .jpeg)</span>
+              </div>
+              {motoInfo.image_url && (
+                <div style={{ textAlign: 'center' }}>
+                  <img src={motoInfo.image_url} alt="Preview" style={{ maxHeight: '100px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #ddd' }} onError={e => e.target.style.display = 'none'} />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Servicio */}
+          <div className="form-group">
+            <label className="form-label">Servicio</label>
+            <select className="search-input" style={{ paddingLeft: '16px' }} value={selectedService} onChange={e => setSelectedService(e.target.value)} required>
+              <option value="">Selecciona un servicio</option>
+              {SERVICIOS_MANUAL.map(s => <option key={s.name} value={s.name}>{s.name} — ${s.price}</option>)}
+            </select>
+          </div>
+
+          {/* Datos del cliente */}
           <div className="form-group">
             <label className="form-label"><User size={14} /> Nombre completo</label>
             <input type="text" className="search-input" style={{ paddingLeft: '16px' }} value={form.client_name} onChange={e => setForm({...form, client_name: e.target.value})} required />
@@ -171,27 +220,11 @@ const AppointmentForm = () => {
           <div className="form-group">
             <label className="form-label"><Fuel size={14} /> Tipo de motor</label>
             <div style={{ display: 'flex', gap: '12px' }}>
-              <label
-                style={{
-                  flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                  padding: '12px', border: `2px solid ${fuelType === 'Carburada' ? 'var(--color-primary)' : '#ddd'}`,
-                  borderRadius: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '14px',
-                  backgroundColor: fuelType === 'Carburada' ? 'rgba(230,0,18,0.05)' : '#fff',
-                  transition: 'all 0.2s ease'
-                }}
-              >
+              <label style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px', border: `2px solid ${fuelType === 'Carburada' ? 'var(--color-primary)' : '#ddd'}`, borderRadius: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '14px', backgroundColor: fuelType === 'Carburada' ? 'rgba(230,0,18,0.05)' : '#fff', transition: 'all 0.2s ease' }}>
                 <input type="radio" name="fuelType" value="Carburada" checked={fuelType === 'Carburada'} onChange={e => setFuelType(e.target.value)} style={{ display: 'none' }} />
                 ⛽ Carburada
               </label>
-              <label
-                style={{
-                  flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                  padding: '12px', border: `2px solid ${fuelType === 'Inyección Electrónica' ? 'var(--color-primary)' : '#ddd'}`,
-                  borderRadius: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '14px',
-                  backgroundColor: fuelType === 'Inyección Electrónica' ? 'rgba(230,0,18,0.05)' : '#fff',
-                  transition: 'all 0.2s ease'
-                }}
-              >
+              <label style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px', border: `2px solid ${fuelType === 'Inyección Electrónica' ? 'var(--color-primary)' : '#ddd'}`, borderRadius: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '14px', backgroundColor: fuelType === 'Inyección Electrónica' ? 'rgba(230,0,18,0.05)' : '#fff', transition: 'all 0.2s ease' }}>
                 <input type="radio" name="fuelType" value="Inyección Electrónica" checked={fuelType === 'Inyección Electrónica'} onChange={e => setFuelType(e.target.value)} style={{ display: 'none' }} />
                 💉 Inyección
               </label>
@@ -233,4 +266,4 @@ const AppointmentForm = () => {
   );
 };
 
-export default AppointmentForm;
+export default ManualAppointmentForm;

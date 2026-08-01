@@ -131,12 +131,13 @@ const AdminCalendar = () => {
       await axios.patch(`${API_URL}/appointments/${selectedAppt.id}`, payload, { headers });
       
       let phone = selectedAppt.client_phone.replace(/\D/g, '');
+      if (!phone.startsWith('52')) phone = '52' + phone;
       if (statusUpdate === 'terminada') {
         window.open(`https://wa.me/${phone}?text=Hola! Tu moto ${selectedAppt.motorcycles?.model_name || 'moto'} se encuentra lista, puedes pasar a recogerla. - MotoServ`);
       } else if (statusUpdate === 'inconveniente') {
         window.open(`https://wa.me/${phone}?text=Hola! Hemos encontrado un inconveniente con tu moto ${selectedAppt.motorcycles?.model_name || 'moto'}: ${issueReason}. Por favor contáctanos. - MotoServ`);
       } else if (isNote && notes) {
-        window.open(`https://wa.me/${phone}?text=Te adjunto el avance de tu moto en ${selectedAppt.motorcycles?.model_name || 'moto'}: ${notes}`);
+        window.open(`https://wa.me/${phone}?text=Te adjunto el avance de tu moto ${selectedAppt.motorcycles?.model_name || 'moto'}: ${notes}`);
       }
       
       fetchAppointments();

@@ -6,6 +6,7 @@ import MotorcycleDetails from './pages/MotorcycleDetails';
 import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
 import AppointmentForm from './pages/AppointmentForm';
+import ManualAppointmentForm from './pages/ManualAppointmentForm';
 import './index.css';
 
 // Inner component that has access to useLocation (inside Router)
@@ -49,6 +50,7 @@ function AppContent() {
           <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/agendar" element={<AppointmentForm />} />
+          <Route path="/agendar-manual" element={<ManualAppointmentForm />} />
         </Routes>
       </main>
     </>

@@ -21,6 +21,10 @@ const AdminDashboard = () => {
   const [brandSearch, setBrandSearch] = useState('');
   const [editingMoto, setEditingMoto] = useState(null);
 
+  // Search states
+  const [motoTableSearch, setMotoTableSearch] = useState('');
+  const [serviceMotoSearch, setServiceMotoSearch] = useState('');
+
   useEffect(() => {
     const token = localStorage.getItem('adminToken');
     if (!token) {
@@ -104,6 +108,20 @@ const AdminDashboard = () => {
     b.name.toLowerCase().includes(brandSearch.toLowerCase())
   );
 
+  // Filtered motos for the table
+  const filteredMotosTable = motorcycles.filter(m => {
+    if (!motoTableSearch.trim()) return true;
+    const q = motoTableSearch.toLowerCase();
+    return m.model_name.toLowerCase().includes(q) || String(m.engine_size).includes(q) || (m.brands?.name || '').toLowerCase().includes(q);
+  });
+
+  // Filtered motos for service price dropdown
+  const filteredMotosService = motorcycles.filter(m => {
+    if (!serviceMotoSearch.trim()) return true;
+    const q = serviceMotoSearch.toLowerCase();
+    return m.model_name.toLowerCase().includes(q) || String(m.engine_size).includes(q);
+  });
+
   if (loading) return <div className="loader-container"><div className="loader"></div></div>;
 
   return (
@@ -164,10 +182,22 @@ const AdminDashboard = () => {
             <div className="moto-showcase" style={{ textAlign: 'left', padding: '24px' }}>
               <h2 style={{ fontFamily: 'Oswald', marginBottom: '20px' }}><Plus size={20} style={{ verticalAlign: 'middle', marginRight: '8px' }}/> Asignar Precio a Servicio</h2>
               <form onSubmit={handleAddServicePrice} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <select className="search-input" style={{ paddingLeft: '16px' }} value={newServicePrice.motorcycle_id} onChange={e => setNewServicePrice({...newServicePrice, motorcycle_id: e.target.value})} required>
-                  <option value="">Selecciona una Moto</option>
-                  {motorcycles.map(m => <option key={m.id} value={m.id}>{m.model_name}</option>)}
-                </select>
+                {/* Buscador + selector de moto */}
+                <div className="form-group">
+                  <label className="form-label"><Search size={14} /> Buscar moto</label>
+                  <input
+                    type="text"
+                    className="search-input"
+                    style={{ paddingLeft: '16px', marginBottom: '8px' }}
+                    placeholder="Filtrar por modelo..."
+                    value={serviceMotoSearch}
+                    onChange={e => setServiceMotoSearch(e.target.value)}
+                  />
+                  <select className="search-input" style={{ paddingLeft: '16px' }} value={newServicePrice.motorcycle_id} onChange={e => setNewServicePrice({...newServicePrice, motorcycle_id: e.target.value})} required>
+                    <option value="">Selecciona una Moto</option>
+                    {filteredMotosService.map(m => <option key={m.id} value={m.id}>{m.model_name} ({m.engine_size}cc)</option>)}
+                  </select>
+                </div>
                 <select className="search-input" style={{ paddingLeft: '16px' }} value={newServicePrice.service_id} onChange={e => setNewServicePrice({...newServicePrice, service_id: e.target.value})} required>
                   <option value="">Selecciona un Servicio</option>
                   {services.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
@@ -178,7 +208,21 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          <h2 style={{ fontFamily: 'Oswald', marginTop: '60px', marginBottom: '20px' }}>Motos Registradas</h2>
+          {/* Motos Registradas con buscador */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '60px', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
+            <h2 style={{ fontFamily: 'Oswald' }}>Motos Registradas</h2>
+            <div style={{ position: 'relative', minWidth: '250px' }}>
+              <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#999' }} />
+              <input
+                type="text"
+                className="search-input"
+                style={{ paddingLeft: '36px', width: '100%' }}
+                placeholder="Buscar moto registrada..."
+                value={motoTableSearch}
+                onChange={e => setMotoTableSearch(e.target.value)}
+              />
+            </div>
+          </div>
           <div style={{ background: 'white', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
               <thead style={{ background: 'var(--color-surface-2)', borderBottom: '2px solid var(--color-border)' }}>
@@ -189,20 +233,24 @@ const AdminDashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {motorcycles.map(moto => (
-                  <tr key={moto.id} style={{ borderBottom: '1px solid var(--color-border)' }}>
-                    <td style={{ padding: '16px' }}>{moto.model_name}</td>
-                    <td style={{ padding: '16px' }}>{moto.engine_size} cc</td>
-                    <td style={{ padding: '16px', display: 'flex', gap: '12px' }}>
-                      <button onClick={() => setEditingMoto(moto)} style={{ background: 'transparent', border: 'none', color: 'var(--color-primary)', cursor: 'pointer' }}>
-                        <Edit3 size={20} />
-                      </button>
-                      <button onClick={() => handleDeleteMoto(moto.id)} style={{ background: 'transparent', border: 'none', color: '#dc2626', cursor: 'pointer' }}>
-                        <Trash2 size={20} />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {filteredMotosTable.length === 0 ? (
+                  <tr><td colSpan="3" style={{ padding: '24px', textAlign: 'center', color: '#999' }}>No se encontraron motos</td></tr>
+                ) : (
+                  filteredMotosTable.map(moto => (
+                    <tr key={moto.id} style={{ borderBottom: '1px solid var(--color-border)' }}>
+                      <td style={{ padding: '16px' }}>{moto.model_name}</td>
+                      <td style={{ padding: '16px' }}>{moto.engine_size} cc</td>
+                      <td style={{ padding: '16px', display: 'flex', gap: '12px' }}>
+                        <button onClick={() => setEditingMoto(moto)} style={{ background: 'transparent', border: 'none', color: 'var(--color-primary)', cursor: 'pointer' }}>
+                          <Edit3 size={20} />
+                        </button>
+                        <button onClick={() => handleDeleteMoto(moto.id)} style={{ background: 'transparent', border: 'none', color: '#dc2626', cursor: 'pointer' }}>
+                          <Trash2 size={20} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

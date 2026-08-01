@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import MotorcycleCard from '../components/MotorcycleCard';
 
@@ -7,6 +8,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 const BRANDS = ['todos', 'bajaj', 'yamaha', 'honda', 'suzuki', 'vento', 'italika', 'kawasaki', 'cfmoto'];
 
 const Home = () => {
+  const navigate = useNavigate();
   const [motorcycles, setMotorcycles] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -82,18 +84,39 @@ const Home = () => {
       </div>
 
       {/* Buscador */}
-      <div className="search-wrapper">
-        <span className="search-icon">Buscar:</span>
-        <input
-          type="text"
-          className="search-input"
-          placeholder="Buscar por modelo o cilindraje..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-        />
-        {search && (
-          <button className="search-clear" onClick={() => setSearch('')}>X</button>
-        )}
+      <div style={{ display: 'flex', gap: '12px', alignItems: 'stretch', flexWrap: 'wrap' }}>
+        <div className="search-wrapper" style={{ flex: 1 }}>
+          <span className="search-icon">Buscar:</span>
+          <input
+            type="text"
+            className="search-input"
+            placeholder="Buscar por modelo o cilindraje..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
+          {search && (
+            <button className="search-clear" onClick={() => setSearch('')}>X</button>
+          )}
+        </div>
+        <button
+          onClick={() => navigate('/agendar-manual')}
+          className="btn-back"
+          style={{
+            background: 'var(--color-primary)',
+            color: 'white',
+            border: 'none',
+            fontFamily: 'Oswald',
+            fontSize: '13px',
+            textTransform: 'uppercase',
+            whiteSpace: 'nowrap',
+            padding: '0 20px',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            letterSpacing: '0.5px'
+          }}
+        >
+          ¿No encuentras tu moto?
+        </button>
       </div>
 
       {/* Filtros de marca (como los tipos de Pokémon) */}
