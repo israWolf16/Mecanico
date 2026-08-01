@@ -186,10 +186,33 @@ const AdminCalendar = () => {
   };
 
   // Helper to get moto info from the joined data
-  const getMotoName = (appt) => appt.motorcycles?.model_name || 'Moto';
-  const getMotoImage = (appt) => appt.motorcycles?.image_url || '';
-  const getMotoEngine = (appt) => appt.motorcycles?.engine_size || '';
-  const getMotoBrand = (appt) => appt.motorcycles?.brands?.name || '';
+  const parseManualMoto = (appt) => {
+    if (appt.motorcycles) return null;
+    const obs = appt.observations || '';
+    if (!obs.startsWith('[MOTO MANUAL]')) return null;
+    const lines = obs.split('\n');
+    const match = lines[0].match(/^\[MOTO MANUAL\] (.*?) (\d+)cc(?: \| Img: (.*))?$/);
+    if (match) {
+      return {
+        name: match[1],
+        engine: match[2],
+        image: match[3] || '',
+        brand: 'Manual',
+        observations: lines.slice(1).join('\n')
+      };
+    }
+    return null;
+  };
+
+  const getMotoName = (appt) => parseManualMoto(appt)?.name || appt.motorcycles?.model_name || 'Moto';
+  const getMotoImage = (appt) => parseManualMoto(appt)?.image || appt.motorcycles?.image_url || '';
+  const getMotoEngine = (appt) => parseManualMoto(appt)?.engine || appt.motorcycles?.engine_size || '';
+  const getMotoBrand = (appt) => parseManualMoto(appt)?.brand || appt.motorcycles?.brands?.name || '';
+  const getObservations = (appt) => {
+    const manual = parseManualMoto(appt);
+    if (manual) return manual.observations || 'Ninguna';
+    return appt.observations || 'Ninguna';
+  };
 
   const renderApptCard = (appt) => {
     const isSelected = selectedAppt?.id === appt.id;
@@ -253,7 +276,7 @@ const AdminCalendar = () => {
             <div style={{ marginBottom: '16px', fontSize: '14px', color: '#444' }}>
               <p><strong>Teléfono:</strong> {appt.client_phone}</p>
               <p><strong>Servicio:</strong> {appt.service_name} — ${appt.service_price}</p>
-              <p><strong>Observaciones:</strong> {appt.observations || 'Ninguna'}</p>
+              <p><strong>Observaciones:</strong> {getObservations(appt)}</p>
             </div>
             
             <div className="form-group" style={{ marginBottom: '16px' }}>

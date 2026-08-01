@@ -157,7 +157,7 @@ const ManualAppointmentForm = () => {
               <div className="form-group">
                 <label className="form-label"><Image size={14} /> URL de la imagen (opcional)</label>
                 <input type="url" className="search-input" style={{ paddingLeft: '16px' }} placeholder="https://ejemplo.com/mi-moto.jpg" value={motoInfo.image_url} onChange={e => setMotoInfo({...motoInfo, image_url: e.target.value})} />
-                <span style={{ fontSize: '11px', color: '#999', marginTop: '4px', display: 'block' }}>Debe ser un enlace directo a una imagen (.jpg, .png, .jpeg)</span>
+                <span style={{ fontSize: '11px', color: '#999', marginTop: '4px', display: 'block' }}>Debe ser un enlace directo a una imagen (.jpg, .png, .jpeg, .webp)</span>
               </div>
               {motoInfo.image_url && (
                 <div style={{ textAlign: 'center' }}>
