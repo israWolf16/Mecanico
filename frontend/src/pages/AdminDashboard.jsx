@@ -18,7 +18,7 @@ const AdminDashboard = () => {
 
   // Form states
   const [newMoto, setNewMoto] = useState({ brand_id: '', model_name: '', engine_size: '', image_url: '' });
-  const [newServicePrice, setNewServicePrice] = useState({ motorcycle_id: '', service_id: '', price: '' });
+  const [newServicePrice, setNewServicePrice] = useState({ motorcycle_ids: [], service_id: '', price: '' });
   const [brandSearch, setBrandSearch] = useState('');
   const [editingMoto, setEditingMoto] = useState(null);
 
@@ -96,8 +96,8 @@ const AdminDashboard = () => {
       await axios.post(`${API_URL}/motorcycle-services`, newServicePrice, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      alert('Precio de servicio asignado/actualizado');
-      setNewServicePrice({ motorcycle_id: '', service_id: '', price: '' });
+      alert('Servicio asignado/actualizado correctamente');
+      setNewServicePrice({ motorcycle_ids: [], service_id: '', price: '' });
     } catch (error) {
       console.error(error);
       alert('Error al asignar precio');
@@ -147,7 +147,7 @@ const AdminDashboard = () => {
 
       {activeTab === 'catalogo' ? (
         <>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }}>
+          <div className="admin-grid-top" style={{ gap: '40px' }}>
             {/* Formulario Agregar Moto */}
             <div className="moto-showcase" style={{ textAlign: 'left', padding: '24px' }}>
               <h2 style={{ fontFamily: 'Oswald', marginBottom: '20px' }}><Plus size={20} style={{ verticalAlign: 'middle', marginRight: '8px' }}/> Agregar Nueva Moto</h2>
@@ -184,7 +184,7 @@ const AdminDashboard = () => {
 
             {/* Formulario Asignar Precio a Servicio */}
             <div className="moto-showcase" style={{ textAlign: 'left', padding: '24px' }}>
-              <h2 style={{ fontFamily: 'Oswald', marginBottom: '20px' }}><Plus size={20} style={{ verticalAlign: 'middle', marginRight: '8px' }}/> Asignar Precio a Servicio</h2>
+              <h2 style={{ fontFamily: 'Oswald', marginBottom: '20px' }}><Plus size={20} style={{ verticalAlign: 'middle', marginRight: '8px' }}/> Asignar Nuevo Servicio</h2>
               <form onSubmit={handleAddServicePrice} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {/* Buscador + selector de moto */}
                 <div className="form-group">
@@ -197,10 +197,52 @@ const AdminDashboard = () => {
                     value={serviceMotoSearch}
                     onChange={e => setServiceMotoSearch(e.target.value)}
                   />
-                  <select className="search-input" style={{ paddingLeft: '16px' }} value={newServicePrice.motorcycle_id} onChange={e => setNewServicePrice({...newServicePrice, motorcycle_id: e.target.value})} required>
-                    <option value="">Selecciona una Moto</option>
-                    {filteredMotosService.map(m => <option key={m.id} value={m.id}>{m.model_name} ({m.engine_size}cc)</option>)}
-                  </select>
+                  
+                  <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+                    <button 
+                      type="button"
+                      onClick={() => {
+                        const newIds = [...new Set([...newServicePrice.motorcycle_ids, ...filteredMotosService.map(m => m.id)])];
+                        setNewServicePrice({...newServicePrice, motorcycle_ids: newIds});
+                      }}
+                      className="btn-back" style={{ fontSize: '11px', padding: '4px 8px' }}
+                    >Seleccionar Todas</button>
+                    <button 
+                      type="button"
+                      onClick={() => setNewServicePrice({...newServicePrice, motorcycle_ids: []})}
+                      className="btn-back" style={{ fontSize: '11px', padding: '4px 8px' }}
+                    >Deseleccionar</button>
+                  </div>
+                  
+                  <div style={{ maxHeight: '150px', overflowY: 'auto', border: '1px solid #ddd', borderRadius: '8px', padding: '8px', backgroundColor: '#f9fafb' }}>
+                    {filteredMotosService.length === 0 ? (
+                      <div style={{ color: '#999', fontSize: '12px', textAlign: 'center', padding: '10px' }}>No hay motos que coincidan</div>
+                    ) : (
+                      filteredMotosService.map(m => (
+                        <label key={m.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px', fontSize: '13px', cursor: 'pointer', borderBottom: '1px solid #eee' }}>
+                          <input 
+                            type="checkbox" 
+                            checked={newServicePrice.motorcycle_ids.includes(m.id)}
+                            onChange={(e) => {
+                              const checked = e.target.checked;
+                              setNewServicePrice(prev => {
+                                const ids = prev.motorcycle_ids;
+                                if (checked) {
+                                  return { ...prev, motorcycle_ids: [...ids, m.id] };
+                                } else {
+                                  return { ...prev, motorcycle_ids: ids.filter(id => id !== m.id) };
+                                }
+                              });
+                            }}
+                          />
+                          {m.model_name} ({m.engine_size}cc)
+                        </label>
+                      ))
+                    )}
+                  </div>
+                  <div style={{ fontSize: '11px', color: '#666', marginTop: '4px' }}>
+                    Motos Seleccionadas: {newServicePrice.motorcycle_ids.length}
+                  </div>
                 </div>
                 <select className="search-input" style={{ paddingLeft: '16px' }} value={newServicePrice.service_id} onChange={e => setNewServicePrice({...newServicePrice, service_id: e.target.value})} required>
                   <option value="">Selecciona un Servicio</option>

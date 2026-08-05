@@ -1045,4 +1045,30 @@ body {
   .detail-actions {
     flex-direction: column;
   }
+  .admin-grid-top,
+  .finances-grid,
+  .liquidation-grid {
+    grid-template-columns: 1fr !important;
+  }
 }
+
+/* ── Responsive Grids ────────────────────────────────────── */
+.admin-grid-top {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.finances-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 30px;
+  align-items: start;
+}
+
+.liquidation-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+

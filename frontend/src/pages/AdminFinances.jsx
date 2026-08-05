@@ -105,7 +105,7 @@ const AdminFinances = () => {
 
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '30px', alignItems: 'start' }}>
+      <div className="finances-grid">
         
         {/* Gráfico */}
         <div style={{ background: 'white', padding: '24px', borderRadius: '12px', border: '1px solid #eee' }}>

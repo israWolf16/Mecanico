@@ -290,7 +290,7 @@ const AdminCalendar = () => {
               <h4 style={{ margin: '0 0 12px 0', color: '#166534', fontSize: '15px' }}>
                 Liquidación
               </h4>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '12px' }}>
+              <div className="liquidation-grid">
                 <div>
                   <label className="form-label" style={{ color: '#166534' }}>Costo Refacciones (MXN)</label>
                   <input type="number" className="search-input" style={{ width: '100%', borderColor: '#bbf7d0', boxSizing: 'border-box' }} value={partsCost} onChange={e => setPartsCost(e.target.value)} placeholder="0.00" />

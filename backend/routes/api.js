@@ -123,14 +123,22 @@ router.delete('/motorcycles/:id', checkAuth, async (req, res) => {
 // 6. Asignar precio de servicio a moto
 router.post('/motorcycle-services', checkAuth, async (req, res) => {
     try {
-        const { motorcycle_id, service_id, price } = req.body;
+        const { motorcycle_ids, motorcycle_id, service_id, price } = req.body;
+        const ids = motorcycle_ids || (motorcycle_id ? [motorcycle_id] : []);
+        
+        if (ids.length === 0) {
+            return res.status(400).json({ error: 'Debes seleccionar al menos una moto' });
+        }
+
+        const inserts = ids.map(id => ({ motorcycle_id: id, service_id, price }));
+
         const { data, error } = await supabase
             .from('motorcycle_services')
-            .upsert([{ motorcycle_id, service_id, price }], { onConflict: 'motorcycle_id,service_id' })
+            .upsert(inserts, { onConflict: 'motorcycle_id,service_id' })
             .select();
             
         if (error) throw error;
-        res.json(data[0]);
+        res.json(data);
     } catch (error) {
         console.error('Error al asignar servicio:', error);
         res.status(500).json({ error: 'Error al asignar servicio' });
