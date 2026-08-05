@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { X, Save } from 'lucide-react';
+import { X, Save, Trash2 } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
@@ -72,6 +72,30 @@ const EditMotoModal = ({ moto, services, onClose, onSaved }) => {
     setServicePrices(updated);
   };
 
+  const handleDeleteService = async (serviceId, index) => {
+    if (!window.confirm('¿Estás seguro de que deseas eliminar este servicio de la moto?')) return;
+    
+    setSaving(true);
+    try {
+      const token = localStorage.getItem('adminToken');
+      const headers = { Authorization: `Bearer ${token}` };
+      
+      await axios.delete(`${API_URL}/motorcycle-services/${moto.id}/${serviceId}`, { headers });
+      
+      const updated = [...servicePrices];
+      updated[index].price = ''; // Clear locally
+      setServicePrices(updated);
+      
+      alert('Servicio eliminado de esta moto');
+      onSaved(); // Refresh background list
+    } catch (error) {
+      console.error(error);
+      alert('Error al eliminar servicio');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={e => e.stopPropagation()}>
@@ -119,6 +143,26 @@ const EditMotoModal = ({ moto, services, onClose, onSaved }) => {
                 <span style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#999', fontWeight: 700 }}>$</span>
                 <input type="number" className="search-input" style={{ paddingLeft: '28px', width: '100%' }} value={sp.price} onChange={e => updateServicePrice(i, e.target.value)} placeholder="0" />
               </div>
+              {sp.price !== '' && sp.price !== null && (
+                <button
+                  type="button"
+                  onClick={() => handleDeleteService(sp.service_id, i)}
+                  title="Eliminar servicio de esta moto"
+                  style={{
+                    background: '#fee2e2',
+                    color: '#ef4444',
+                    border: 'none',
+                    padding: '8px',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <Trash2 size={16} />
+                </button>
+              )}
             </div>
           ))}
         </div>

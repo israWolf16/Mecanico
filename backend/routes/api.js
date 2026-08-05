@@ -173,6 +173,23 @@ router.post('/motorcycle-services', checkAuth, async (req, res) => {
     }
 });
 
+// 6.5 Eliminar precio de servicio asignado a moto
+router.delete('/motorcycle-services/:motorcycle_id/:service_id', checkAuth, async (req, res) => {
+    try {
+        const { motorcycle_id, service_id } = req.params;
+        const { error } = await supabase
+            .from('motorcycle_services')
+            .delete()
+            .match({ motorcycle_id, service_id });
+            
+        if (error) throw error;
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error al eliminar servicio asignado:', error);
+        res.status(500).json({ error: 'Error al eliminar servicio asignado' });
+    }
+});
+
 // 7. Obtener todas las marcas
 router.get('/brands', async (req, res) => {
     try {
