@@ -18,7 +18,7 @@ const AdminDashboard = () => {
 
   // Form states
   const [newMoto, setNewMoto] = useState({ brand_id: '', model_name: '', engine_size: '', image_url: '' });
-  const [newServicePrice, setNewServicePrice] = useState({ motorcycle_ids: [], service_id: '', price: '' });
+  const [newServicePrice, setNewServicePrice] = useState({ motorcycle_ids: [], service_name: '', price: '' });
   const [brandSearch, setBrandSearch] = useState('');
   const [editingMoto, setEditingMoto] = useState(null);
 
@@ -97,7 +97,7 @@ const AdminDashboard = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       alert('Servicio asignado/actualizado correctamente');
-      setNewServicePrice({ motorcycle_ids: [], service_id: '', price: '' });
+      setNewServicePrice({ motorcycle_ids: [], service_name: '', price: '' });
     } catch (error) {
       console.error(error);
       alert('Error al asignar precio');
@@ -244,10 +244,7 @@ const AdminDashboard = () => {
                     Motos Seleccionadas: {newServicePrice.motorcycle_ids.length}
                   </div>
                 </div>
-                <select className="search-input" style={{ paddingLeft: '16px' }} value={newServicePrice.service_id} onChange={e => setNewServicePrice({...newServicePrice, service_id: e.target.value})} required>
-                  <option value="">Selecciona un Servicio</option>
-                  {services.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                </select>
+                <input type="text" placeholder="Nombre del Nuevo Servicio" className="search-input" style={{ paddingLeft: '16px' }} value={newServicePrice.service_name} onChange={e => setNewServicePrice({...newServicePrice, service_name: e.target.value})} required />
                 <input type="number" placeholder="Precio ($)" className="search-input" style={{ paddingLeft: '16px' }} value={newServicePrice.price} onChange={e => setNewServicePrice({...newServicePrice, price: e.target.value})} required />
                 <button type="submit" className="btn-back" style={{ background: 'var(--color-primary)', color: 'white' }}>Asignar Precio</button>
               </form>

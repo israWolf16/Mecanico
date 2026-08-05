@@ -123,14 +123,42 @@ router.delete('/motorcycles/:id', checkAuth, async (req, res) => {
 // 6. Asignar precio de servicio a moto
 router.post('/motorcycle-services', checkAuth, async (req, res) => {
     try {
-        const { motorcycle_ids, motorcycle_id, service_id, price } = req.body;
+        const { motorcycle_ids, motorcycle_id, service_id, service_name, price } = req.body;
         const ids = motorcycle_ids || (motorcycle_id ? [motorcycle_id] : []);
         
         if (ids.length === 0) {
             return res.status(400).json({ error: 'Debes seleccionar al menos una moto' });
         }
+        
+        let finalServiceId = service_id;
+        
+        if (service_name && !finalServiceId) {
+            // Buscamos si existe
+            const { data: existingService, error: searchError } = await supabase
+                .from('services')
+                .select('id')
+                .ilike('name', service_name.trim());
+                
+            if (searchError) throw searchError;
+            
+            if (existingService && existingService.length > 0) {
+                finalServiceId = existingService[0].id;
+            } else {
+                // Creamos el servicio
+                const { data: newService, error: insertError } = await supabase
+                    .from('services')
+                    .insert([{ name: service_name.trim(), description: 'Servicio agregado' }])
+                    .select();
+                if (insertError) throw insertError;
+                finalServiceId = newService[0].id;
+            }
+        }
+        
+        if (!finalServiceId) {
+            return res.status(400).json({ error: 'Debes especificar un servicio' });
+        }
 
-        const inserts = ids.map(id => ({ motorcycle_id: id, service_id, price }));
+        const inserts = ids.map(id => ({ motorcycle_id: id, service_id: finalServiceId, price }));
 
         const { data, error } = await supabase
             .from('motorcycle_services')
