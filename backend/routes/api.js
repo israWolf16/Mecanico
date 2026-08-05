@@ -329,4 +329,37 @@ router.delete('/appointments/:id', checkAuth, async (req, res) => {
     }
 });
 
+// 17. Obtener una configuración
+router.get('/settings/:key', async (req, res) => {
+    try {
+        const { key } = req.params;
+        const { data, error } = await supabase
+            .from('store_settings')
+            .select('value')
+            .eq('key', key)
+            .single();
+        if (error && error.code !== 'PGRST116') throw error; // Ignorar si no se encuentra
+        res.json({ value: data ? data.value : null });
+    } catch (error) {
+        console.error('Error al obtener setting:', error);
+        res.status(500).json({ error: 'Error al obtener setting' });
+    }
+});
+
+// 18. Actualizar o crear una configuración (admin)
+router.post('/settings', checkAuth, async (req, res) => {
+    try {
+        const { key, value } = req.body;
+        const { data, error } = await supabase
+            .from('store_settings')
+            .upsert([{ key, value }], { onConflict: 'key' })
+            .select();
+        if (error) throw error;
+        res.json({ success: true, setting: data[0] });
+    } catch (error) {
+        console.error('Error al guardar setting:', error);
+        res.status(500).json({ error: 'Error al guardar setting' });
+    }
+});
+
 module.exports = router;

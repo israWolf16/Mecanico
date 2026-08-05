@@ -13,6 +13,7 @@ const Home = () => {
   const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [bankAccount, setBankAccount] = useState('');
   const [search, setSearch] = useState('');
   const [brandFilter, setBrandFilter] = useState('todos');
 
@@ -44,7 +45,17 @@ const Home = () => {
     };
 
     fetchMotorcycles();
+    fetchBankAccount();
   }, []);
+
+  const fetchBankAccount = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/settings/bank_account`);
+      if (res.data && res.data.value) setBankAccount(res.data.value);
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   // Filtrar por búsqueda y marca
   useEffect(() => {
@@ -98,7 +109,33 @@ const Home = () => {
             <button className="search-clear" onClick={() => setSearch('')}>X</button>
           )}
         </div>
-        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', flexWrap: 'wrap' }}>
+          <button
+            onClick={() => {
+              if (!bankAccount) {
+                alert('Número de cuenta no configurado');
+                return;
+              }
+              navigator.clipboard.writeText(bankAccount);
+              alert('¡Número de cuenta copiado!');
+            }}
+            className="btn-back"
+            style={{
+              background: '#f9fafb',
+              color: '#374151',
+              border: '1px solid #d1d5db',
+              fontFamily: 'Oswald',
+              fontSize: '13px',
+              textTransform: 'uppercase',
+              whiteSpace: 'nowrap',
+              padding: '8px 20px',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              letterSpacing: '0.5px'
+            }}
+          >
+            Copiar número de cuenta
+          </button>
           <button
             onClick={() => navigate('/agendar-manual')}
             className="btn-back"

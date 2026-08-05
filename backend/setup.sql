@@ -41,6 +41,13 @@ CREATE TABLE motorcycle_services (
     UNIQUE(motorcycle_id, service_id)
 );
 
+-- 5. Crear tabla de configuraciones
+CREATE TABLE store_settings (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL
+);
+INSERT INTO store_settings (key, value) VALUES ('bank_account', '1234567890123456');
+
 -- -------------------------------------------------------------
 -- Datos de Prueba Iniciales (Mock Data) para probar rápidamente
 -- -------------------------------------------------------------

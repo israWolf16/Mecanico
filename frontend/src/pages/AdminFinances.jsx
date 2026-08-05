@@ -9,10 +9,40 @@ const AdminFinances = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedAppt, setSelectedAppt] = useState(null);
+  const [bankAccount, setBankAccount] = useState('');
+  const [isSavingBank, setIsSavingBank] = useState(false);
 
   useEffect(() => {
     fetchFinishedAppointments();
+    fetchBankAccount();
   }, []);
+
+  const fetchBankAccount = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/settings/bank_account`);
+      if (res.data && res.data.value) setBankAccount(res.data.value);
+    } catch (err) {
+      console.error('Error fetching bank account:', err);
+    }
+  };
+
+  const handleSaveBankAccount = async () => {
+    setIsSavingBank(true);
+    try {
+      const token = localStorage.getItem('adminToken');
+      await axios.post(`${API_URL}/settings`, {
+        key: 'bank_account',
+        value: bankAccount
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      alert('Número de cuenta guardado correctamente');
+    } catch (err) {
+      console.error(err);
+      alert('Error al guardar el número de cuenta');
+    }
+    setIsSavingBank(false);
+  };
 
   const fetchFinishedAppointments = async () => {
     try {
@@ -70,6 +100,32 @@ const AdminFinances = () => {
   return (
     <div className="animate-fade-in" style={{ padding: '20px 0' }}>
       
+      {/* Configuración de Cuenta Bancaria */}
+      <div style={{ background: 'white', padding: '24px', borderRadius: '12px', border: '1px solid #eee', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+        <div style={{ flex: 1, minWidth: '250px' }}>
+          <h3 style={{ margin: '0 0 8px 0', fontFamily: 'Oswald', textTransform: 'uppercase', fontSize: '16px' }}>Cuenta Bancaria para Clientes</h3>
+          <p style={{ margin: 0, color: '#666', fontSize: '13px' }}>Este número será el que los clientes copien desde la pantalla principal al presionar el botón.</p>
+        </div>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <input 
+            type="text" 
+            value={bankAccount} 
+            onChange={e => setBankAccount(e.target.value)} 
+            placeholder="Ej. 1234 5678 9012 3456" 
+            className="search-input"
+            style={{ width: '250px' }}
+          />
+          <button 
+            className="btn-back" 
+            onClick={handleSaveBankAccount}
+            disabled={isSavingBank}
+            style={{ background: 'var(--color-primary)', color: 'white', border: 'none' }}
+          >
+            {isSavingBank ? 'Guardando...' : 'Guardar'}
+          </button>
+        </div>
+      </div>
+
       {/* Tarjetas de resumen */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px', marginBottom: '30px' }}>
         
