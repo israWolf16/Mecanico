@@ -84,8 +84,8 @@ const Home = () => {
       </div>
 
       {/* Buscador */}
-      <div style={{ display: 'flex', gap: '12px', alignItems: 'stretch', flexWrap: 'wrap' }}>
-        <div className="search-wrapper" style={{ flex: 1 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '16px' }}>
+        <div className="search-wrapper" style={{ width: '100%', marginBottom: 0 }}>
           <span className="search-icon">Buscar:</span>
           <input
             type="text"
@@ -98,25 +98,27 @@ const Home = () => {
             <button className="search-clear" onClick={() => setSearch('')}>X</button>
           )}
         </div>
-        <button
-          onClick={() => navigate('/agendar-manual')}
-          className="btn-back"
-          style={{
-            background: 'var(--color-primary)',
-            color: 'white',
-            border: 'none',
-            fontFamily: 'Oswald',
-            fontSize: '13px',
-            textTransform: 'uppercase',
-            whiteSpace: 'nowrap',
-            padding: '0 20px',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            letterSpacing: '0.5px'
-          }}
-        >
-          ¿No encuentras tu moto?
-        </button>
+        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <button
+            onClick={() => navigate('/agendar-manual')}
+            className="btn-back"
+            style={{
+              background: 'var(--color-primary)',
+              color: 'white',
+              border: 'none',
+              fontFamily: 'Oswald',
+              fontSize: '13px',
+              textTransform: 'uppercase',
+              whiteSpace: 'nowrap',
+              padding: '8px 20px',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              letterSpacing: '0.5px'
+            }}
+          >
+            ¿No encuentras tu moto?
+          </button>
+        </div>
       </div>
 
       {/* Filtros de marca (como los tipos de Pokémon) */}

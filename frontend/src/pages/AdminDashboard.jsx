@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Trash2, Plus, Edit3, Search } from 'lucide-react';
 import AdminCalendar from './AdminCalendar';
+import AdminFinances from './AdminFinances';
 import EditMotoModal from '../components/EditMotoModal';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
@@ -139,6 +140,9 @@ const AdminDashboard = () => {
         <button className={`admin-tab ${activeTab === 'calendario' ? 'active' : ''}`} onClick={() => setActiveTab('calendario')}>
           Calendario
         </button>
+        <button className={`admin-tab ${activeTab === 'finanzas' ? 'active' : ''}`} onClick={() => setActiveTab('finanzas')}>
+          Finanzas
+        </button>
       </div>
 
       {activeTab === 'catalogo' ? (
@@ -255,8 +259,10 @@ const AdminDashboard = () => {
             </table>
           </div>
         </>
-      ) : (
+      ) : activeTab === 'calendario' ? (
         <AdminCalendar />
+      ) : (
+        <AdminFinances />
       )}
 
       {/* Edit Modal */}

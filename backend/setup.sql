@@ -101,6 +101,8 @@ CREATE TABLE appointments (
     observations TEXT,
     moto_color TEXT,
     fuel_type TEXT,
+    parts_cost NUMERIC(10,2),
+    total_charged NUMERIC(10,2),
     appointment_date DATE NOT NULL,
     appointment_time TIME NOT NULL,
     status TEXT DEFAULT 'pendiente' CHECK (status IN ('pendiente','terminada','inconveniente')),

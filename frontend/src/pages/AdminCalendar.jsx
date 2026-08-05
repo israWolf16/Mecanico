@@ -16,6 +16,8 @@ const AdminCalendar = () => {
 
   const [notes, setNotes] = useState('');
   const [evidence, setEvidence] = useState('');
+  const [partsCost, setPartsCost] = useState('');
+  const [totalCharged, setTotalCharged] = useState('');
 
   useEffect(() => {
     fetchAppointments();
@@ -112,6 +114,8 @@ const AdminCalendar = () => {
     setSelectedAppt(appt.id === selectedAppt?.id ? null : appt);
     setNotes(appt.mechanic_notes || '');
     setEvidence(appt.evidence_images ? appt.evidence_images.join(', ') : '');
+    setPartsCost(appt.parts_cost || '');
+    setTotalCharged(appt.total_charged || '');
   };
 
   const updateAppt = async (statusUpdate = null, issueReason = null, isNote = false) => {
@@ -121,7 +125,9 @@ const AdminCalendar = () => {
       
       const payload = {
         mechanic_notes: notes,
-        evidence_images: evidence.split(',').map(e => e.trim()).filter(e => e)
+        evidence_images: evidence.split(',').map(e => e.trim()).filter(e => e),
+        parts_cost: partsCost !== '' ? parseFloat(partsCost) : null,
+        total_charged: totalCharged !== '' ? parseFloat(totalCharged) : null
       };
       
       if (statusUpdate) {
@@ -279,6 +285,32 @@ const AdminCalendar = () => {
               <p><strong>Observaciones:</strong> {getObservations(appt)}</p>
             </div>
             
+            {/* Liquidación */}
+            <div style={{ backgroundColor: '#f0fdf4', padding: '16px', borderRadius: '8px', marginBottom: '16px', border: '1px solid #bbf7d0' }}>
+              <h4 style={{ margin: '0 0 12px 0', color: '#166534', fontSize: '15px' }}>
+                Liquidación
+              </h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '12px' }}>
+                <div>
+                  <label className="form-label" style={{ color: '#166534' }}>Costo Refacciones (MXN)</label>
+                  <input type="number" className="search-input" style={{ width: '100%', borderColor: '#bbf7d0', boxSizing: 'border-box' }} value={partsCost} onChange={e => setPartsCost(e.target.value)} placeholder="0.00" />
+                </div>
+                <div>
+                  <label className="form-label" style={{ color: '#166534' }}>Cobro Total (MXN)</label>
+                  <input type="number" className="search-input" style={{ width: '100%', borderColor: '#bbf7d0', boxSizing: 'border-box' }} value={totalCharged} onChange={e => setTotalCharged(e.target.value)} placeholder="0.00" />
+                </div>
+              </div>
+              
+              {(partsCost !== '' && totalCharged !== '') && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '12px', paddingTop: '12px', borderTop: '1px dashed #bbf7d0', fontSize: '14px', fontWeight: 'bold' }}>
+                  <span style={{ color: '#166534' }}>Ganancia Real: ${(parseFloat(totalCharged) - parseFloat(partsCost)).toFixed(2)}</span>
+                  <span style={{ color: parseFloat(partsCost) > 0 ? '#166534' : '#666' }}>
+                    Rendimiento: {parseFloat(partsCost) > 0 ? (((parseFloat(totalCharged) - parseFloat(partsCost)) / parseFloat(partsCost)) * 100).toFixed(1) + '%' : 'N/A'}
+                  </span>
+                </div>
+              )}
+            </div>
+
             <div className="form-group" style={{ marginBottom: '16px' }}>
               <label className="form-label"><FileText size={14} /> Notas del Mecánico</label>
               <textarea 
