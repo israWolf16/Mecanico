@@ -101,25 +101,25 @@ const AdminFinances = () => {
     <div className="animate-fade-in" style={{ padding: '20px 0' }}>
       
       {/* Configuración de Cuenta Bancaria */}
-      <div style={{ background: 'white', padding: '24px', borderRadius: '12px', border: '1px solid #eee', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
-        <div style={{ flex: 1, minWidth: '250px' }}>
+      <div style={{ background: 'white', padding: '24px', borderRadius: '12px', border: '1px solid #eee', marginBottom: '20px', display: 'flex', flexDirection: 'column', gap: '16px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+        <div>
           <h3 style={{ margin: '0 0 8px 0', fontFamily: 'Oswald', textTransform: 'uppercase', fontSize: '16px' }}>Cuenta Bancaria para Clientes</h3>
           <p style={{ margin: 0, color: '#666', fontSize: '13px' }}>Este número será el que los clientes copien desde la pantalla principal al presionar el botón.</p>
         </div>
-        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
           <input 
             type="text" 
             value={bankAccount} 
             onChange={e => setBankAccount(e.target.value)} 
             placeholder="Ej. 1234 5678 9012 3456" 
             className="search-input"
-            style={{ width: '250px' }}
+            style={{ flex: 1, minWidth: '200px' }}
           />
           <button 
             className="btn-back" 
             onClick={handleSaveBankAccount}
             disabled={isSavingBank}
-            style={{ background: 'var(--color-primary)', color: 'white', border: 'none' }}
+            style={{ background: 'var(--color-primary)', color: 'white', border: 'none', whiteSpace: 'nowrap' }}
           >
             {isSavingBank ? 'Guardando...' : 'Guardar'}
           </button>
